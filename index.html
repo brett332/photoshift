@@ -3,1360 +3,900 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ListingShift — Photo & Video Variator</title>
+<title>PhotoShift — Photo & Video Variator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
-
   :root {
-    --bg: #0f0e0c;
-    --surface: #1a1916;
-    --surface2: #242320;
-    --border: #2e2d29;
+    --bg: #0f0f11;
+    --surface: #18181c;
+    --border: #2a2a30;
+    --text: #e8e8ec;
+    --muted: #666674;
     --accent: #e8c547;
-    --accent2: #c4a832;
-    --text: #f0ede6;
-    --muted: #7a786f;
-    --danger: #e05c3a;
     --green: #4caf7d;
-    --blue: #5a9fd4;
+    --red: #e05c5c;
+    --blue: #5c9fe0;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Mono', monospace;
+    font-size: 13px;
     min-height: 100vh;
   }
 
-  header {
-    padding: 22px 40px;
-    border-bottom: 1px solid var(--border);
+  /* HEADER */
+  .header {
     display: flex;
     align-items: center;
-    gap: 20px;
-    background: var(--surface);
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
   }
-
-  header h1 {
+  .logo {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 1.4rem;
-    letter-spacing: -0.02em;
+    font-size: 1.1rem;
     color: var(--accent);
+    letter-spacing: -0.02em;
   }
-
-  header span.subtitle {
-    font-size: 0.65rem;
+  .logo span { color: var(--muted); font-weight: 700; }
+  .version-badge {
+    font-size: 0.6rem;
+    color: var(--accent);
+    background: rgba(232,197,71,0.1);
+    border: 1px solid rgba(232,197,71,0.2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  .header-spacer { flex: 1; }
+  .save-status {
+    font-size: 0.6rem;
     color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
-  .save-indicator {
-    margin-left: auto;
-    font-size: 0.65rem;
-    color: var(--green);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-  .save-indicator.show { opacity: 1; }
-  .save-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
-
+  /* LAYOUT */
   .main {
     display: grid;
-    grid-template-columns: 290px 1fr;
-    min-height: calc(100vh - 67px);
+    grid-template-columns: 300px 1fr;
+    min-height: calc(100vh - 53px);
+  }
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
   }
 
+  /* SIDEBAR */
   .sidebar {
-    background: var(--surface);
     border-right: 1px solid var(--border);
-    padding: 20px;
+    padding: 20px 16px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    overflow-y: auto;
+    gap: 16px;
   }
-
   .section-label {
-    font-size: 0.63rem;
-    letter-spacing: 0.14em;
+    font-size: 0.6rem;
     text-transform: uppercase;
+    letter-spacing: 0.1em;
     color: var(--muted);
     margin-bottom: 8px;
   }
 
-  .mode-tabs { display: flex; gap: 6px; }
-  .mode-tab {
-    flex: 1; padding: 8px;
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-  }
-  .mode-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(232,197,71,0.07); }
-
+  /* UPLOAD ZONE */
   .upload-zone {
     border: 1.5px dashed var(--border);
     border-radius: 8px;
-    padding: 20px 14px;
+    padding: 24px 16px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
-    background: var(--surface2);
-    position: relative;
-    overflow: hidden;
+    background: var(--surface);
   }
-  .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: rgba(232,197,71,0.05); }
-  .upload-zone input[type="file"] {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    font-size: 0;
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(232,197,71,0.04);
   }
-  .upload-zone .upload-icon,
-  .upload-zone p { pointer-events: none; }
-  .upload-icon { font-size: 1.8rem; margin-bottom: 6px; opacity: 0.45; }
-  .upload-zone p { font-size: 0.68rem; color: var(--muted); line-height: 1.6; }
-  .upload-zone strong { color: var(--accent); }
+  .upload-zone input { display: none; }
+  .upload-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .upload-text { color: var(--muted); font-size: 0.7rem; line-height: 1.6; }
+  .upload-text strong { color: var(--accent); display: block; font-size: 0.75rem; }
 
-  .template-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
-
-  .template-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 9px; background: var(--surface2);
-    border-radius: 6px; border: 1px solid var(--border);
+  /* PRODUCT SHELF */
+  .product-shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 240px;
+    overflow-y: auto;
   }
-  .template-thumb {
-    width: 36px; height: 36px; object-fit: cover;
-    border-radius: 3px; flex-shrink: 0; background: var(--border);
-  }
-  .video-icon-thumb {
-    width: 36px; height: 36px; flex-shrink: 0;
-    background: rgba(90,159,212,0.12);
-    border-radius: 3px; display: flex;
-    align-items: center; justify-content: center;
-    font-size: 1rem; color: var(--blue);
-  }
-  .template-info { flex: 1; overflow: hidden; }
-  .template-name { font-size: 0.68rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .template-type { font-size: 0.58rem; color: var(--muted); }
-  .saved-badge {
-    font-size: 0.55rem; background: rgba(76,175,125,0.15);
-    color: var(--green); border-radius: 3px; padding: 1px 5px;
-    border: 1px solid rgba(76,175,125,0.3);
-  }
-  .remove-btn {
-    background: none; border: none; color: var(--muted);
-    cursor: pointer; font-size: 0.85rem; padding: 2px 5px;
-    border-radius: 3px; transition: color 0.15s; flex-shrink: 0;
-  }
-  .remove-btn:hover { color: var(--danger); }
-
-  .var-count { display: flex; gap: 5px; }
-  .var-btn {
-    flex: 1; padding: 7px 4px;
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 5px;
-    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.78rem;
-    cursor: pointer; transition: all 0.15s; text-align: center;
-  }
-  .var-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .var-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
-
-  .control-group { display: flex; flex-direction: column; gap: 10px; }
-  .toggle-row { display: flex; justify-content: space-between; align-items: center; }
-  .toggle-label { font-size: 0.7rem; color: var(--text); }
-  .toggle { position: relative; width: 34px; height: 19px; }
-  .toggle input { display: none; }
-  .toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 19px; cursor: pointer; transition: background 0.2s; }
-  .toggle-slider::after { content: ''; position: absolute; width: 13px; height: 13px; background: var(--muted); border-radius: 50%; top: 3px; left: 3px; transition: all 0.2s; }
-  .toggle input:checked + .toggle-slider { background: var(--accent); }
-  .toggle input:checked + .toggle-slider::after { left: 18px; background: var(--bg); }
-
-  .control-row { display: flex; flex-direction: column; gap: 5px; }
-  .control-row label { font-size: 0.65rem; color: var(--muted); display: flex; justify-content: space-between; }
-  .control-row label span { color: var(--accent); }
-  input[type=range] { -webkit-appearance: none; width: 100%; height: 3px; background: var(--border); border-radius: 2px; outline: none; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; background: var(--accent); border-radius: 50%; cursor: pointer; }
-
-  .progress-bar { width: 100%; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; display: none; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
-  .status-text { font-size: 0.63rem; color: var(--muted); text-align: center; min-height: 16px; }
-
-  .generate-btn {
-    width: 100%; padding: 13px;
-    background: var(--accent); color: var(--bg); border: none; border-radius: 8px;
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
-    cursor: pointer; transition: all 0.2s; margin-top: auto;
-  }
-  .generate-btn:hover { background: var(--accent2); transform: translateY(-1px); }
-  .generate-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-
-  .info-box {
-    background: rgba(90,159,212,0.08); border: 1px solid rgba(90,159,212,0.2);
-    border-radius: 6px; padding: 10px 12px; font-size: 0.63rem; color: var(--blue); line-height: 1.6;
-  }
-  .info-box.green { background: rgba(76,175,125,0.08); border-color: rgba(76,175,125,0.25); color: var(--green); }
-
-  .hidden { display: none !important; }
-
-  /* Content */
-  .content { padding: 24px; overflow-y: auto; }
-  .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-  .content-header h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; }
-
-  .product-group { margin-bottom: 32px; }
-  .product-group-header {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
-  }
-  .product-group-thumb { width: 30px; height: 30px; object-fit: cover; border-radius: 4px; }
-  .product-group-name { font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 600; }
-  .product-group-meta { font-size: 0.63rem; color: var(--muted); }
-  .product-dl-btn {
-    margin-left: auto; padding: 5px 14px;
-    background: transparent; border: 1.5px solid var(--accent);
-    color: var(--accent); border-radius: 5px;
-    font-family: 'DM Mono', monospace; font-size: 0.67rem;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
-  }
-  .product-dl-btn:hover { background: var(--accent); color: var(--bg); }
-  .product-dl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .variations-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  .product-thumb {
+    display: flex;
+    align-items: center;
     gap: 10px;
-  }
-  .variation-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 7px; overflow: hidden; transition: all 0.2s;
-  }
-  .variation-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .variation-card img, .variation-card video {
-    width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--surface2);
-  }
-  .variation-footer {
-    padding: 7px 9px; display: flex; justify-content: space-between; align-items: center;
-  }
-  .variation-tag { font-size: 0.58rem; color: var(--muted); letter-spacing: 0.06em; }
-  .dl-btn {
-    background: none; border: 1px solid var(--border); color: var(--muted);
-    font-size: 0.62rem; padding: 3px 8px; border-radius: 4px;
-    cursor: pointer; font-family: 'DM Mono', monospace; transition: all 0.15s;
-  }
-  .dl-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; height: 55vh; gap: 12px; text-align: center; color: var(--muted);
-  }
-  .empty-icon { font-size: 3rem; opacity: 0.25; }
-  .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; color: var(--text); opacity: 0.45; }
-  .empty-state p { font-size: 0.7rem; line-height: 1.7; max-width: 260px; }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .hdr-btn {
-    padding: 5px 13px;
-    background: transparent;
+    padding: 8px 10px;
+    border-radius: 6px;
     border: 1px solid var(--border);
-    border-radius: 5px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
+    background: var(--surface);
     cursor: pointer;
     transition: all 0.15s;
-    letter-spacing: 0.05em;
+    position: relative;
   }
-  .hdr-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .hdr-btn.export { border-color: rgba(76,175,125,0.4); color: var(--green); }
-  .hdr-btn.export:hover { background: rgba(76,175,125,0.08); }
+  .product-thumb:hover { border-color: var(--accent); }
+  .product-thumb.selected { border-color: var(--accent); background: rgba(232,197,71,0.06); }
+  .product-thumb img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .product-thumb .vid-thumb {
+    width: 38px;
+    height: 38px;
+    background: var(--bg);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .product-info { flex: 1; min-width: 0; }
+  .product-name {
+    font-size: 0.72rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .product-meta { font-size: 0.6rem; color: var(--muted); }
+  .product-del {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 5px;
+    border-radius: 3px;
+    display: none;
+  }
+  .product-thumb:hover .product-del { display: block; }
+  .product-del:hover { color: var(--red); background: rgba(224,92,92,0.1); }
 
-  /* ── SESSION PANEL ── */
-  .session-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
-  .session-field label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-  .session-input {
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
-    padding: 8px 10px; color: var(--text); font-family: 'DM Mono', monospace;
-    font-size: 0.78rem; outline: none; width: 100%; transition: border-color 0.15s;
+  /* CONTROLS */
+  .control-group { display: flex; flex-direction: column; gap: 8px; }
+  .control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
-  .session-input:focus { border-color: var(--accent); }
-  .session-input::placeholder { color: var(--muted); }
+  .control-label { color: var(--muted); font-size: 0.68rem; }
+  .toggle {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    cursor: pointer;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 9px;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--accent); }
+  .toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.2s;
+    pointer-events: none;
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(14px); }
 
-  .session-loc-list { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto; }
-  .session-loc-item {
-    display: flex; align-items: center; gap: 7px;
-    padding: 5px 8px; border-radius: 5px; cursor: pointer;
-    border: 1px solid transparent; transition: all 0.12s;
-    font-size: 0.72rem; color: var(--text);
-    user-select: none;
+  .slider-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .slider-wrap input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
   }
-  .session-loc-item:hover { background: var(--surface2); }
-  .session-loc-item.selected { background: rgba(232,197,71,0.07); border-color: rgba(232,197,71,0.3); }
-  .session-loc-check {
-    width: 14px; height: 14px; border: 1.5px solid var(--border);
-    border-radius: 3px; flex-shrink: 0; display: flex;
-    align-items: center; justify-content: center;
-    font-size: 0.6rem; color: var(--bg); transition: all 0.12s;
+  .slider-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
   }
-  .session-loc-item.selected .session-loc-check { background: var(--accent); border-color: var(--accent); }
+  .slider-val { color: var(--accent); font-size: 0.65rem; min-width: 28px; text-align: right; }
 
-  .session-mode-badge {
-    background: rgba(232,197,71,0.1); border: 1px solid rgba(232,197,71,0.3);
-    border-radius: 5px; padding: 6px 10px; font-size: 0.65rem;
-    color: var(--accent); text-align: center; margin-top: 4px;
+  /* VARIATION COUNT */
+  .var-btns {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .var-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .var-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .var-btn.active { border-color: var(--accent); background: rgba(232,197,71,0.1); color: var(--accent); }
+
+  /* FOLDER NAME */
+  .folder-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .folder-input:focus { border-color: var(--accent); }
+
+  /* GENERATE BTN */
+  .generate-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #0f0f11;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .generate-btn:hover { background: #f0d060; transform: translateY(-1px); }
+  .generate-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+
+  /* MAIN PANEL */
+  .panel {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 
-  .zip-btn {
-    padding: 7px 14px; background: transparent;
-    border: 1.5px solid var(--green); color: var(--green);
-    border-radius: 6px; font-family: 'DM Mono', monospace;
-    font-size: 0.7rem; cursor: pointer; transition: all 0.15s;
+  /* EMPTY STATE */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 60px 20px;
   }
-  .zip-btn:hover { background: rgba(76,175,125,0.1); }
+  .empty-icon { font-size: 3rem; opacity: 0.3; }
+  .empty-text { font-size: 0.75rem; line-height: 1.7; max-width: 280px; }
 
-  .loc-group-header {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 10px; padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
+  /* RESULTS GRID */
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
   }
-  .loc-group-pill {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 20px; padding: 3px 12px;
-    font-size: 0.65rem; color: var(--accent);
-    font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+  .results-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
   }
-  .loc-group { margin-bottom: 28px; }
+  .results-meta { color: var(--muted); font-size: 0.65rem; }
+
+  .download-all-btn {
+    padding: 7px 14px;
+    background: var(--green);
+    color: #0f0f11;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .download-all-btn:hover { background: #5dc98a; }
+
+  .variants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .variant-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .variant-card:hover { border-color: var(--accent); }
+  .variant-preview {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    background: var(--bg);
+  }
+  .variant-preview.video-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--muted);
+  }
+  .variant-footer {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .variant-num { color: var(--muted); font-size: 0.6rem; }
+  .dl-btn {
+    padding: 4px 9px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dl-btn:hover { border-color: var(--green); color: var(--green); }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    display: none;
+  }
+  .progress-bar-wrap.active { display: block; }
+  .progress-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 10px; }
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.2s;
+    width: 0%;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>ListingShift</h1>
-  <span class="subtitle">Photo &amp; Video Variator</span>
-  <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--accent);background:rgba(232,197,71,0.1);padding:3px 8px;border-radius:4px;margin-left:8px;">v14</span>
-  <div class="save-indicator" id="saveIndicator">
-    <div class="save-dot"></div> Templates saved
-  </div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-    <button class="hdr-btn" onclick="triggerPhotoImport()">⬆ Import Templates</button>
-    <button class="hdr-btn export" onclick="exportPhotoTemplates()">⬇ Export Templates</button>
-    <input type="file" id="photoImportInput" accept=".json" style="display:none" onchange="importPhotoTemplates(this)">
-    <span style="font-size:0.6rem;color:var(--muted);" id="hdrStatus"></span>
-  </div>
-</header>
+<div class="header">
+  <div class="logo">Photo<span>Shift</span></div>
+  <div class="version-badge">v15</div>
+  <div class="header-spacer"></div>
+  <div class="save-status" id="saveStatus">ready</div>
+</div>
 
 <div class="main">
-  <aside class="sidebar">
 
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Upload -->
     <div>
-      <div class="section-label">Mode</div>
-      <div class="mode-tabs">
-        <div class="mode-tab active" data-mode="photo">📷 Photos</div>
-        <div class="mode-tab" data-mode="video">🎬 Videos</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="section-label">Upload Templates</div>
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-        <div class="upload-icon">⊕</div>
-        <p id="uploadHint"><strong>Click here or drop photos</strong><br>JPG, PNG, WEBP</p>
-        <input type="file" id="fileInput" accept="image/*" multiple onclick="event.stopPropagation()" onchange="handleFiles(this.files);this.value=''">
-      </div>
-    </div>
-
-    <div id="persistInfoWrap">
-      <div class="info-box green">
-        ✦ Photos auto-save in your browser — your templates will still be here next time you open this file. No re-uploading needed.
-      </div>
-    </div>
-
-    <div>
-      <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span>Templates (<span id="templateCount">0</span>)</span>
-        <button onclick="clearAllTemplates()" style="background:none;border:none;color:var(--muted);font-size:0.6rem;cursor:pointer;font-family:'DM Mono',monospace;text-decoration:underline;">clear all</button>
-      </div>
-      <div class="template-list" id="templateList">
-        <p style="font-size:0.68rem;color:var(--muted);text-align:center;padding:10px 0;">No templates yet</p>
-      </div>
-    </div>
-
-    <div>
-      <div class="section-label">Variations per Template</div>
-      <div id="varCountWrap">
-        <div class="var-count">
-          <button class="var-btn" data-n="1" onclick="setVarCount(1,this)">1</button>
-          <button class="var-btn" data-n="3" onclick="setVarCount(3,this)">3</button>
-          <button class="var-btn" data-n="4" onclick="setVarCount(4,this)">4</button>
-          <button class="var-btn active" data-n="5" onclick="setVarCount(5,this)">5</button>
-          <button class="var-btn" data-n="8" onclick="setVarCount(8,this)">8</button>
-          <button class="var-btn" data-n="10" onclick="setVarCount(10,this)">10</button>
-        </div>
-      </div>
-      <div id="sessionModeBadge" class="session-mode-badge" style="display:none;"></div>
-    </div>
-
-    <!-- SESSION PANEL -->
-    <div>
-      <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span>Session Folders</span>
-        <button onclick="toggleSessionPanel()" style="background:none;border:none;color:var(--muted);font-size:0.6rem;cursor:pointer;font-family:'DM Mono',monospace;text-decoration:underline;" id="sessionToggleBtn">expand</button>
-      </div>
-      <div id="sessionPanel" style="display:none;">
-        <div class="session-field">
-          <label>Date</label>
-          <input class="session-input" id="sessionDate" placeholder="05132026">
-        </div>
-        <div class="session-field">
-          <label>Product Name</label>
-          <input class="session-input" id="sessionProduct" placeholder="e.g. Planters" oninput="updateSessionBadge()">
-        </div>
-        <div class="section-label" style="margin-bottom:6px;margin-top:4px;">Locations</div>
-        <div class="session-loc-list" id="sessionLocList"></div>
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <input class="session-input" id="newSessionLoc" placeholder="Add location…" style="flex:1;" onkeydown="if(event.key==='Enter')addSessionLocation()">
-          <button onclick="addSessionLocation()" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);border-radius:5px;padding:0 10px;cursor:pointer;font-size:1rem;">+</button>
+      <div class="section-label">Upload Files</div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">
+          <strong>Drop photos or videos here</strong>
+          or click to browse<br>
+          JPG, PNG, WEBP, MP4, MOV
         </div>
       </div>
     </div>
 
-    <!-- Photo transforms -->
-    <div id="photoControls">
-      <div class="section-label">Transformations</div>
+    <!-- Product shelf -->
+    <div>
+      <div class="section-label">Uploaded Files (<span id="fileCount">0</span>)</div>
+      <div class="product-shelf" id="productShelf">
+        <!-- thumbs injected -->
+      </div>
+    </div>
+
+    <!-- Transforms -->
+    <div>
+      <div class="section-label">Transforms</div>
       <div class="control-group">
-        <div class="toggle-row"><span class="toggle-label">Horizontal Flip</span><label class="toggle"><input type="checkbox" id="doFlip" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Brightness Shift</span><label class="toggle"><input type="checkbox" id="doBrightness" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Contrast Tweak</span><label class="toggle"><input type="checkbox" id="doContrast" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Subtle Crop / Zoom</span><label class="toggle"><input type="checkbox" id="doCrop" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Tiny Rotation (±2°)</span><label class="toggle"><input type="checkbox" id="doRotate" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Saturation Shift</span><label class="toggle"><input type="checkbox" id="doSaturation" checked><span class="toggle-slider"></span></label></div>
-      </div>
-      <div class="control-row" style="margin-top:8px;">
-        <label>Intensity <span id="intensityVal">15%</span></label>
-        <input type="range" id="intensity" min="5" max="60" value="15">
+        <div class="control-row">
+          <span class="control-label">Flip horizontal</span>
+          <label class="toggle">
+            <input type="checkbox" id="tFlip" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="control-row">
+          <span class="control-label">Micro rotation</span>
+          <label class="toggle">
+            <input type="checkbox" id="tRotate" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="control-row">
+          <span class="control-label">Crop / zoom</span>
+          <label class="toggle">
+            <input type="checkbox" id="tCrop" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="control-row">
+          <span class="control-label">Brightness</span>
+          <label class="toggle">
+            <input type="checkbox" id="tBright" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="control-row">
+          <span class="control-label">Contrast</span>
+          <label class="toggle">
+            <input type="checkbox" id="tContrast" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="control-row">
+          <span class="control-label">Saturation</span>
+          <label class="toggle">
+            <input type="checkbox" id="tSat" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
       </div>
     </div>
 
-    <!-- Video transforms -->
-    <div id="videoControls" class="hidden">
-      <div class="section-label">Video Transforms</div>
-      <div class="control-group">
-        <div class="toggle-row"><span class="toggle-label">Horizontal Flip</span><label class="toggle"><input type="checkbox" id="vDoFlip" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Brightness Shift</span><label class="toggle"><input type="checkbox" id="vDoBrightness" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Contrast Tweak</span><label class="toggle"><input type="checkbox" id="vDoContrast" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Saturation Shift</span><label class="toggle"><input type="checkbox" id="vDoSaturation" checked><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Subtle Crop / Zoom</span><label class="toggle"><input type="checkbox" id="vDoCrop" checked><span class="toggle-slider"></span></label></div>
-      </div>
-      <div class="control-row" style="margin-top:8px;">
-        <label>Intensity <span id="vIntensityVal">25%</span></label>
-        <input type="range" id="vIntensity" min="5" max="50" value="25">
-      </div>
-      <div class="info-box" style="margin-top:4px;">
-        ⚠ Video rendering plays back each clip in real time. Allow extra time for longer videos. Output is WebM format.
+    <!-- Intensity -->
+    <div>
+      <div class="section-label">Intensity</div>
+      <div class="control-row">
+        <span class="control-label">Shift amount</span>
+        <div class="slider-wrap">
+          <input type="range" id="intensity" min="5" max="60" value="20">
+          <span class="slider-val" id="intensityVal">20%</span>
+        </div>
       </div>
     </div>
 
-    <div class="status-text" id="statusText"></div>
-    <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+    <!-- Variation count -->
+    <div>
+      <div class="section-label">Variations per file</div>
+      <div class="var-btns" id="varBtns">
+        <button class="var-btn" data-n="1">1</button>
+        <button class="var-btn" data-n="3">3</button>
+        <button class="var-btn active" data-n="5">5</button>
+        <button class="var-btn" data-n="8">8</button>
+        <button class="var-btn" data-n="10">10</button>
+      </div>
+    </div>
 
+    <!-- Folder name -->
+    <div>
+      <div class="section-label">Download folder name</div>
+      <input type="text" class="folder-input" id="folderName" placeholder="e.g. planter-north" value="">
+    </div>
+
+    <!-- Generate -->
     <button class="generate-btn" id="generateBtn" disabled>Generate Variations →</button>
-  </aside>
 
-  <main class="content">
-    <div class="content-header">
-      <h2 id="contentTitle">Variations</h2>
-      <button class="zip-btn" id="zipBtn" style="display:none;" onclick="downloadZip()">⬇ Save to Folder</button>
-    </div>
-    <div id="outputArea">
-      <div class="empty-state">
-        <div class="empty-icon">◫</div>
-        <h3>Ready when you are</h3>
-        <p>Upload product templates, choose variation count and transforms, then hit Generate.</p>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <div class="panel" id="panel">
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🖼</div>
+      <div class="empty-text">
+        Upload photos or videos on the left, then hit <strong style="color:var(--accent)">Generate Variations</strong> to create uniquely shifted copies for each listing location.
       </div>
     </div>
-  </main>
+
+    <div class="progress-bar-wrap" id="progressWrap">
+      <div class="progress-label" id="progressLabel">Processing...</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div id="resultsArea"></div>
+
+  </div>
 </div>
 
 <script>
-// ─── State ─────────────────────────────────────────────────────────────────
-let mode = 'photo';
-let photoTemplates = [];
-let videoTemplates = [];
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let files = [];       // {id, file, name, type, url, isVideo}
 let varCount = 5;
-let generatedData = [];
+let selectedIds = new Set();
+let results = [];     // {sourceId, sourceName, blobs}
 
-const STORAGE_KEY     = 'listingshift_photos_v1';
-const SESSION_LOC_KEY = 'listingshift_locs_v1';
-
-// ─── Session State ──────────────────────────────────────────────────────────
-let sessionLocations = [];
-let sessionPanelOpen = false;
-
-const DEFAULT_SESSION_LOCS = [
-  'Baltimore N','Baltimore S','Baltimore E','Baltimore W',
-  'Winchester N','Winchester S','Winchester E','Winchester W',
-  'Waynesboro N','Waynesboro S','Waynesboro E','Waynesboro W',
-];
-
-function todayMMDDYYYY() {
-  const d = new Date();
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const dd = String(d.getDate()).padStart(2,'0');
-  const yy = d.getFullYear();
-  return `${mm}${dd}${yy}`;
-}
-
-function loadSessionLocs() {
-  try {
-    const raw = localStorage.getItem(SESSION_LOC_KEY);
-    if (raw) { sessionLocations = JSON.parse(raw); return; }
-  } catch(e){}
-  sessionLocations = DEFAULT_SESSION_LOCS.map(n => ({ name: n, selected: false }));
-  saveSessionLocs();
-}
-
-function saveSessionLocs() {
-  localStorage.setItem(SESSION_LOC_KEY, JSON.stringify(sessionLocations));
-}
-
-function toggleSessionPanel() {
-  sessionPanelOpen = !sessionPanelOpen;
-  document.getElementById('sessionPanel').style.display = sessionPanelOpen ? 'block' : 'none';
-  document.getElementById('sessionToggleBtn').textContent = sessionPanelOpen ? 'collapse' : 'expand';
-}
-
-function renderSessionLocList() {
-  const el = document.getElementById('sessionLocList');
-  el.innerHTML = sessionLocations.map((l,i) => `
-    <div class="session-loc-item ${l.selected?'selected':''}" onclick="toggleSessionLoc(${i})">
-      <div class="session-loc-check">${l.selected?'✓':''}</div>
-      <span style="flex:1;">${l.name}</span>
-      <button onclick="event.stopPropagation();removeSessionLoc(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.75rem;padding:0 2px;">✕</button>
-    </div>`).join('');
-  updateSessionBadge();
-}
-
-function toggleSessionLoc(i) {
-  sessionLocations[i].selected = !sessionLocations[i].selected;
-  saveSessionLocs();
-  renderSessionLocList();
-  updateSessionBadge();
-}
-
-function removeSessionLoc(i) {
-  sessionLocations.splice(i,1);
-  saveSessionLocs();
-  renderSessionLocList();
-}
-
-function addSessionLocation() {
-  const inp = document.getElementById('newSessionLoc');
-  const name = inp.value.trim();
-  if (!name) return;
-  sessionLocations.push({ name, selected: true });
-  inp.value = '';
-  saveSessionLocs();
-  renderSessionLocList();
-  updateSessionBadge();
-}
-
-function getSelectedLocs() {
-  return sessionLocations.filter(l => l.selected);
-}
-
-function isSessionMode() {
-  return getSelectedLocs().length > 0;
-}
-
-function updateSessionBadge() {
-  const locs = getSelectedLocs();
-  const badge = document.getElementById('sessionModeBadge');
-  const varWrap = document.getElementById('varCountWrap');
-  if (locs.length > 0) {
-    badge.style.display = 'block';
-    badge.textContent = `Session mode — 1 variation per location (${locs.length} selected)`;
-    varWrap.style.opacity = '0.4';
-    // Note: intentionally NOT disabling pointer-events — user can still adjust var count
-    // even in session mode (it won't be used but should remain clickable)
-  } else {
-    badge.style.display = 'none';
-    varWrap.style.opacity = '1';
-  }
-}
-
-// ─── Persistence ───────────────────────────────────────────────────────────
-function savePhotoTemplates() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(
-      photoTemplates.map(t => ({ name: t.name, src: t.src }))
-    ));
-    const ind = document.getElementById('saveIndicator');
-    ind.classList.add('show');
-    setTimeout(() => ind.classList.remove('show'), 2200);
-  } catch(e) { console.warn('Storage full', e); }
-}
-
-function loadPhotoTemplates() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    if (!data.length) return;
-    let n = 0;
-    data.forEach(d => {
-      const img = new Image();
-      img.onload = () => {
-        photoTemplates.push({ name: d.name, src: d.src, img, saved: true });
-        n++;
-        if (n === data.length) { renderTemplateList(); updateGenerateBtn(); }
-      };
-      img.src = d.src;
-    });
-  } catch(e) {}
-}
-
-window.clearAllTemplates = function() {
-  if (mode === 'photo') { photoTemplates = []; localStorage.removeItem(STORAGE_KEY); }
-  else { videoTemplates.forEach(t => URL.revokeObjectURL(t.src)); videoTemplates = []; }
-  renderTemplateList(); updateGenerateBtn();
-};
-
-// ─── Mode tabs ─────────────────────────────────────────────────────────────
-document.querySelectorAll('.mode-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    mode = tab.dataset.mode;
-    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const fi = document.getElementById('fileInput');
-    if (mode === 'photo') {
-      fi.accept = 'image/*';
-      fi.multiple = true;
-      document.getElementById('uploadHint').innerHTML = '<strong>Drop photos here</strong><br>or click to browse<br>JPG, PNG, WEBP';
-      document.getElementById('photoControls').classList.remove('hidden');
-      document.getElementById('videoControls').classList.add('hidden');
-      document.getElementById('persistInfoWrap').classList.remove('hidden');
-    } else {
-      fi.accept = 'video/*';
-      fi.multiple = true;
-      document.getElementById('uploadHint').innerHTML = '<strong>Drop videos here</strong><br>or click to browse<br>MP4, MOV, WEBM';
-      document.getElementById('photoControls').classList.add('hidden');
-      document.getElementById('videoControls').classList.remove('hidden');
-      document.getElementById('persistInfoWrap').classList.add('hidden');
-    }
-    renderTemplateList(); updateGenerateBtn();
-  });
+// ─── INTENSITY SLIDER ────────────────────────────────────────────────────────
+const intensitySlider = document.getElementById('intensity');
+const intensityVal    = document.getElementById('intensityVal');
+intensitySlider.addEventListener('input', () => {
+  intensityVal.textContent = intensitySlider.value + '%';
 });
 
-// ─── Upload ────────────────────────────────────────────────────────────────
+// ─── VAR BUTTONS ─────────────────────────────────────────────────────────────
+document.getElementById('varBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.var-btn');
+  if (!btn) return;
+  document.querySelectorAll('.var-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  varCount = parseInt(btn.dataset.n);
+});
+
+// ─── UPLOAD ───────────────────────────────────────────────────────────────────
 const uploadZone = document.getElementById('uploadZone');
 const fileInput  = document.getElementById('fileInput');
 
-// Prevent browser opening dropped files in a new tab
-window.addEventListener('dragover', e => e.preventDefault(), false);
-window.addEventListener('drop',     e => e.preventDefault(), false);
-
-// Drag styling on the zone
-uploadZone.addEventListener('dragenter', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-uploadZone.addEventListener('dragleave', e => { if (!uploadZone.contains(e.relatedTarget)) uploadZone.classList.remove('dragover'); });
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
 uploadZone.addEventListener('drop', e => {
   e.preventDefault();
-  e.stopPropagation();
   uploadZone.classList.remove('dragover');
-  if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+  handleFiles([...e.dataTransfer.files]);
 });
+fileInput.addEventListener('change', () => handleFiles([...fileInput.files]));
 
-// File selected via picker — also handled inline on the element as fallback
-
-function handleFiles(files) {
-  if (!files || !files.length) return;
-  Array.from(files).forEach(file => {
-    const name = file.name.replace(/\.[^.]+$/, '');
-    const isImage = file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(file.name);
-    const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|m4v)$/i.test(file.name);
-
-    if (mode === 'photo' && isImage) {
-      const reader = new FileReader();
-      reader.onerror = () => console.warn('Failed to read:', file.name);
-      reader.onload = ev => {
-        const img = new Image();
-        img.onerror = () => console.warn('Failed to decode:', file.name);
-        img.onload = () => {
-          photoTemplates.push({ name, src: ev.target.result, img, saved: false });
-          try { savePhotoTemplates(); } catch(e) { console.warn('Save failed', e); }
-          renderTemplateList();
-          updateGenerateBtn();
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    } else if (mode === 'video' && isVideo) {
-      videoTemplates.push({ name, src: URL.createObjectURL(file), blob: file, type: file.type });
-      renderTemplateList();
-      updateGenerateBtn();
-    }
+function handleFiles(newFiles) {
+  newFiles.forEach(f => {
+    if (!f.type.startsWith('image/') && !f.type.startsWith('video/')) return;
+    const id  = Math.random().toString(36).slice(2);
+    const url = URL.createObjectURL(f);
+    files.push({ id, file: f, name: f.name, type: f.type, url, isVideo: f.type.startsWith('video/') });
+    selectedIds.add(id);
   });
+  renderShelf();
+  updateGenBtn();
+  fileInput.value = '';
 }
 
-window.removeTemplate = function(i) {
-  if (mode === 'photo') { photoTemplates.splice(i, 1); savePhotoTemplates(); }
-  else { URL.revokeObjectURL(videoTemplates[i].src); videoTemplates.splice(i, 1); }
-  renderTemplateList(); updateGenerateBtn();
-};
+function renderShelf() {
+  const shelf = document.getElementById('productShelf');
+  document.getElementById('fileCount').textContent = files.length;
+  shelf.innerHTML = '';
+  files.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'product-thumb' + (selectedIds.has(f.id) ? ' selected' : '');
+    div.dataset.id = f.id;
 
-function renderTemplateList() {
-  const list = document.getElementById('templateList');
-  const tpls = mode === 'photo' ? photoTemplates : videoTemplates;
-  document.getElementById('templateCount').textContent = tpls.length;
-  if (!tpls.length) {
-    list.innerHTML = '<p style="font-size:0.68rem;color:var(--muted);text-align:center;padding:10px 0;">No templates yet</p>';
-    return;
-  }
-  list.innerHTML = tpls.map((t, i) => `
-    <div class="template-item">
-      ${mode === 'photo'
-        ? `<img class="template-thumb" src="${t.src}">`
-        : `<div class="video-icon-thumb">🎬</div>`}
-      <div class="template-info">
-        <div class="template-name">${t.name}</div>
-        <div class="template-type">${mode === 'photo' ? 'Photo' : 'Video'}${t.saved ? ' &nbsp;<span class="saved-badge">saved</span>' : ''}</div>
-      </div>
-      <button class="remove-btn" onclick="removeTemplate(${i})">✕</button>
-    </div>
-  `).join('');
-}
-
-function updateGenerateBtn() {
-  const tpls = mode === 'photo' ? photoTemplates : videoTemplates;
-  document.getElementById('generateBtn').disabled = tpls.length === 0;
-}
-
-// ─── Var count ─────────────────────────────────────────────────────────────
-window.setVarCount = function(n, btn) {
-  varCount = n;
-  document.querySelectorAll('.var-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-};
-
-document.querySelectorAll('.var-btn').forEach(btn => {
-  btn.addEventListener('click', () => setVarCount(parseInt(btn.dataset.n), btn));
-});
-
-document.getElementById('intensity').addEventListener('input', e => {
-  document.getElementById('intensityVal').textContent = e.target.value + '%';
-});
-document.getElementById('vIntensity').addEventListener('input', e => {
-  document.getElementById('vIntensityVal').textContent = e.target.value + '%';
-});
-
-// ─── Generate ──────────────────────────────────────────────────────────────
-document.getElementById('generateBtn').addEventListener('click', () => {
-  if (isSessionMode()) generateSession();
-  else if (mode === 'photo') generatePhotos();
-  else generateVideos();
-});
-
-// ─── PHOTO GENERATION ──────────────────────────────────────────────────────
-async function generatePhotos() {
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true; btn.textContent = 'Generating…';
-  generatedData = [];
-  showProgress(true);
-  const total = photoTemplates.length * varCount;
-  let done = 0;
-  const groups = [];
-
-  for (const tpl of photoTemplates) {
-    setStatus(`Processing: ${tpl.name}`);
-    const variations = [];
-    for (let v = 0; v < varCount; v++) {
-      const canvas = await applyPhotoVar(tpl.img, v);
-      const fileName = randFileName('jpg');
-      variations.push({ dataUrl: canvas.toDataURL('image/jpeg', 0.92), label: fileName, fileName });
-      setProgress(++done / total);
-      await sleep(8);
-    }
-    groups.push({ name: tpl.name, thumb: tpl.src, variations, type: 'photo' });
-    generatedData.push({ name: tpl.name, folderName: tpl.name.replace(/[^a-zA-Z0-9]/g,'_'), variations, type: 'photo' });
-  }
-
-  renderOutput(groups);
-  btn.disabled = false; btn.textContent = 'Generate Variations →';
-  showProgress(false);
-  setStatus(`✓ ${total} variations ready`);
-  document.getElementById('contentTitle').textContent = `${total} Photo Variations`;
-  showZipBtn('photos');
-}
-
-function applyPhotoVar(srcImg, seed) {
-  return new Promise(resolve => {
-    const intensity = parseInt(document.getElementById('intensity').value) / 100;
-
-    // True randomness — different every generation. Seed only ensures
-    // each variation within a batch differs from the others.
-    const rng = () => {
-      // Mix Math.random() with seed offset so variations in same batch stay distinct
-      return Math.random();
-    };
-
-    const W = srcImg.naturalWidth || srcImg.width;
-    const H = srcImg.naturalHeight || srcImg.height;
-    const sz = Math.min(W, H, 1200);
-    const canvas = document.createElement('canvas');
-    canvas.width = sz; canvas.height = sz;
-    const ctx = canvas.getContext('2d');
-
-    const flip = document.getElementById('doFlip').checked && rng() > 0.45;
-
-    // Crop & zoom: randomly choose zoom-in, zoom-out, or neutral
-    const doCrop = document.getElementById('doCrop').checked;
-    let sx=0, sy=0, sw=W, sh=H;
-    let zoomOut = false;
-    let zoomScale = 1;
-
-    // Guaranteed minimum shift — direction always random, magnitude always at least minVal
-    const guaranteedShift = (minVal, maxVal) => {
-      const direction = rng() > 0.5 ? 1 : -1;
-      const magnitude = minVal + rng() * (maxVal - minVal);
-      return direction * magnitude;
-    };
-
-    if (doCrop) {
-      const mode = rng();
-      if (mode < 0.45) {
-        // Zoom in — always at least 2% crop
-        const ca = 0.02 + intensity * 0.08 * rng();
-        sx = W * ca * rng();
-        sy = H * ca * rng();
-        sw = W * (1 - ca);
-        sh = H * (1 - ca);
-      } else if (mode < 0.75) {
-        // Zoom out — always at least 3% shrink
-        zoomOut = true;
-        zoomScale = 1 - (0.03 + intensity * 0.05 * rng());
-      } else {
-        // Neutral crop — still shift at least 1% to change pixel hash
-        const ca = 0.01 + intensity * 0.03 * rng();
-        sx = W * ca * rng();
-        sy = H * ca * rng();
-        sw = W * (1 - ca);
-        sh = H * (1 - ca);
-      }
-    }
-
-    if (zoomOut) {
-      const tmp = document.createElement('canvas');
-      tmp.width = sz; tmp.height = sz;
-      const tctx = tmp.getContext('2d');
-      tctx.filter = 'blur(18px)';
-      tctx.drawImage(srcImg, 0, 0, sz, sz);
-      tctx.filter = 'none';
-      tctx.fillStyle = 'rgba(0,0,0,0.18)';
-      tctx.fillRect(0, 0, sz, sz);
-      ctx.drawImage(tmp, 0, 0);
-      const drawW = sz * zoomScale;
-      const drawH = sz * zoomScale;
-      ctx.save();
-      ctx.translate(sz/2, sz/2);
-      if (flip) ctx.scale(-1, 1);
-      ctx.drawImage(srcImg, 0, 0, W, H, -drawW/2, -drawH/2, drawW, drawH);
-      ctx.restore();
+    if (f.isVideo) {
+      div.innerHTML = `
+        <div class="vid-thumb">🎬</div>
+        <div class="product-info">
+          <div class="product-name">${f.name}</div>
+          <div class="product-meta">video</div>
+        </div>
+        <span class="product-del" data-del="${f.id}">✕</span>`;
     } else {
-      // Always rotate at least ±0.4° to change pixel positions
-      const minAngle = 0.4;
-      const maxAngle = 0.4 + 2.5 * intensity;
-      const angle = document.getElementById('doRotate').checked
-        ? guaranteedShift(minAngle, maxAngle)
-        : guaranteedShift(0.2, 0.5); // always rotate slightly even if toggle off
-      ctx.save();
-      ctx.translate(sz/2, sz/2);
-      ctx.rotate(angle * Math.PI / 180);
-      if (flip) ctx.scale(-1, 1);
-      ctx.drawImage(srcImg, sx, sy, sw, sh, -sz/2, -sz/2, sz, sz);
-      ctx.restore();
+      div.innerHTML = `
+        <img src="${f.url}" alt="">
+        <div class="product-info">
+          <div class="product-name">${f.name}</div>
+          <div class="product-meta">photo</div>
+        </div>
+        <span class="product-del" data-del="${f.id}">✕</span>`;
     }
 
-    // CSS filters — guaranteed minimum shifts, imperceptible to humans
-    const filters = [];
-    if (document.getElementById('doBrightness').checked) {
-      // Always at least ±2% brightness change
-      const shift = guaranteedShift(0.02, 0.02 + 0.10 * intensity);
-      const nudge = guaranteedShift(0.002, 0.005);
-      filters.push(`brightness(${(1 + shift + nudge).toFixed(4)})`);
-    }
-    if (document.getElementById('doContrast').checked) {
-      // Always at least ±1.5% contrast change
-      const shift = guaranteedShift(0.015, 0.015 + 0.08 * intensity);
-      filters.push(`contrast(${(1 + shift).toFixed(4)})`);
-    }
-    if (document.getElementById('doSaturation').checked) {
-      // Always at least ±2% saturation change
-      const shift = guaranteedShift(0.02, 0.02 + 0.12 * intensity);
-      filters.push(`saturate(${(1 + shift).toFixed(4)})`);
-    }
+    div.addEventListener('click', e => {
+      if (e.target.dataset.del) return;
+      if (selectedIds.has(f.id)) selectedIds.delete(f.id);
+      else selectedIds.add(f.id);
+      div.classList.toggle('selected');
+      updateGenBtn();
+    });
 
-    // If no filters enabled, force a tiny brightness shift anyway
-    // so no photo ever passes through pixel-identical
-    if (!filters.length) {
-      const shift = guaranteedShift(0.02, 0.04);
-      filters.push(`brightness(${(1 + shift).toFixed(4)})`);
-    }
+    div.querySelector('.product-del').addEventListener('click', e => {
+      e.stopPropagation();
+      files = files.filter(x => x.id !== f.id);
+      selectedIds.delete(f.id);
+      renderShelf();
+      updateGenBtn();
+    });
 
-    if (filters.length) {
-      const tmp = document.createElement('canvas');
-      tmp.width = sz; tmp.height = sz;
-      const tctx = tmp.getContext('2d');
-      tctx.filter = filters.join(' ');
-      tctx.drawImage(canvas, 0, 0);
-      ctx.clearRect(0, 0, sz, sz);
-      ctx.drawImage(tmp, 0, 0);
-    }
-
-    resolve(canvas);
+    shelf.appendChild(div);
   });
 }
 
-// ─── VIDEO GENERATION ──────────────────────────────────────────────────────
-async function generateVideos() {
+function updateGenBtn() {
   const btn = document.getElementById('generateBtn');
-  btn.disabled = true; btn.textContent = 'Processing videos…';
-  generatedData = [];
-  showProgress(true);
-  const total = videoTemplates.length * varCount;
-  let done = 0;
-  const groups = [];
-
-  for (const tpl of videoTemplates) {
-    const variations = [];
-    for (let v = 0; v < varCount; v++) {
-      setStatus(`${tpl.name} — rendering variation ${v+1}/${varCount}…`);
-      const blob = await renderVideoVar(tpl.blob, v);
-      const fileName = randFileName('webm');
-      variations.push({ url: URL.createObjectURL(blob), blob, label: fileName, fileName });
-      setProgress(++done / total);
-    }
-    groups.push({ name: tpl.name, thumb: null, variations, type: 'video' });
-    generatedData.push({ name: tpl.name, folderName: tpl.name.replace(/[^a-zA-Z0-9]/g,'_'), variations, type: 'video' });
-  }
-
-  renderOutput(groups);
-  btn.disabled = false; btn.textContent = 'Generate Variations →';
-  showProgress(false);
-  setStatus(`✓ ${total} video variations ready`);
-  document.getElementById('contentTitle').textContent = `${total} Video Variations`;
-  showZipBtn('videos');
+  btn.disabled = selectedIds.size === 0;
 }
 
-function renderVideoVar(videoFile, seed) {
-  return new Promise((resolve, reject) => {
-    const intensity = parseInt(document.getElementById('vIntensity').value) / 100;
+// ─── GENERATE ─────────────────────────────────────────────────────────────────
+document.getElementById('generateBtn').addEventListener('click', generate);
 
-    // True randomness per generation
-    const rng = () => Math.random();
-
-    const flip = document.getElementById('vDoFlip').checked && rng() > 0.45;
-    const filters = [];
-    if (document.getElementById('vDoBrightness').checked) {
-      const base = (rng()-0.5)*0.28*intensity;
-      filters.push(`brightness(${(1+base+(rng()-0.5)*0.004).toFixed(4)})`);
-    }
-    if (document.getElementById('vDoContrast').checked) {
-      const base = (rng()-0.5)*0.23*intensity;
-      filters.push(`contrast(${(1+base+(rng()-0.5)*0.003).toFixed(4)})`);
-    }
-    if (document.getElementById('vDoSaturation').checked) {
-      const base = (rng()-0.5)*0.33*intensity;
-      filters.push(`saturate(${(1+base+(rng()-0.5)*0.004).toFixed(4)})`);
-    }
-    const filterStr = filters.join(' ') || 'none';
-
-    const video = document.createElement('video');
-    video.src = URL.createObjectURL(videoFile);
-    video.muted = true; video.playsInline = true;
-
-    video.onloadedmetadata = () => {
-      const W=video.videoWidth, H=video.videoHeight;
-      const outW=Math.min(W,1280), outH=Math.round(outW*H/W);
-      const canvas=document.createElement('canvas');
-      canvas.width=outW; canvas.height=outH;
-      const ctx=canvas.getContext('2d');
-
-      let sx=0,sy=0,sw=W,sh=H;
-      if (document.getElementById('vDoCrop').checked) {
-        const ca=intensity*0.08*rng();
-        sx=W*ca*rng(); sy=H*ca*rng(); sw=W*(1-ca); sh=H*(1-ca);
-      }
-
-      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-        ? 'video/webm;codecs=vp9' : 'video/webm';
-      const stream = canvas.captureStream(30);
-      const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4000000 });
-      const chunks = [];
-      rec.ondataavailable = e => { if (e.data.size>0) chunks.push(e.data); };
-      rec.onstop = () => { URL.revokeObjectURL(video.src); resolve(new Blob(chunks, {type: mime})); };
-
-      const draw = () => {
-        if (video.ended) { setTimeout(()=>rec.stop(),200); return; }
-        ctx.save();
-        ctx.filter = filterStr;
-        if (flip) { ctx.translate(outW,0); ctx.scale(-1,1); }
-        ctx.drawImage(video, sx,sy,sw,sh, 0,0,outW,outH);
-        ctx.restore();
-        requestAnimationFrame(draw);
-      };
-
-      rec.start();
-      video.play().then(draw);
-      video.onended = () => setTimeout(()=>rec.stop(),200);
-    };
-    video.onerror = reject;
-    video.load();
-  });
-}
-
-// ─── OUTPUT RENDER ─────────────────────────────────────────────────────────
-function renderOutput(groups) {
-  document.getElementById('outputArea').innerHTML = groups.map((g, gi) => `
-    <div class="product-group" id="grp${gi}">
-      <div class="product-group-header">
-        ${g.type==='photo' && g.thumb
-          ? `<img class="product-group-thumb" src="${g.thumb}">`
-          : `<div class="product-group-thumb" style="background:rgba(90,159,212,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;">🎬</div>`
-        }
-        <span class="product-group-name">${g.name}</span>
-        <span class="product-group-meta">&nbsp;· ${g.variations.length} vars</span>
-        <button class="product-dl-btn" id="dlbtn${gi}" onclick="downloadGroup(${gi})">⬇ Download ${g.name}</button>
-      </div>
-      <div class="variations-grid">
-        ${g.variations.map((v,vi) => `
-          <div class="variation-card">
-            ${g.type==='photo'
-              ? `<img src="${v.dataUrl}" loading="lazy">`
-              : `<video src="${v.url}" muted loop autoplay playsinline></video>`
-            }
-            <div class="variation-footer">
-              <span class="variation-tag">${v.label}</span>
-              <button class="dl-btn" onclick="downloadOne(${gi},${vi})">↓ save</button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
-}
-
-// ─── DOWNLOADS ─────────────────────────────────────────────────────────────
-function randFileName(ext) {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const rand = Array.from({length: 9}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  return `img_${rand}.${ext}`;
-}
-
-function showZipBtn(folderBase, isSession) {
-  const zb = document.getElementById('zipBtn');
-  zb.style.display = '';
-  zb.dataset.folder = folderBase;
-  zb.dataset.session = isSession ? 'true' : 'false';
-}
-
-window.downloadOne = function(gi, vi) {
-  const g = generatedData[gi], v = g.variations[vi];
-  const a = document.createElement('a');
-  if (g.type==='photo') { a.href=v.dataUrl; a.download=randFileName('jpg'); }
-  else                  { a.href=v.url;     a.download=randFileName('webm'); }
-  a.click();
-};
-
-window.downloadGroup = async function(gi) {
-  const btn = document.getElementById(`dlbtn${gi}`);
-  const orig = btn.textContent;
-  btn.disabled=true; btn.textContent='⬇ Saving…';
-  const g = generatedData[gi];
-  for (let vi=0; vi<g.variations.length; vi++) { downloadOne(gi,vi); await sleep(180); }
-  await sleep(400);
-  btn.textContent=orig; btn.disabled=false;
-};
-
-// ─── UTILS ─────────────────────────────────────────────────────────────────
-function varLabel(v) { return `VAR-${String(v+1).padStart(2,'0')}`; }
-function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
-
-function showProgress(show) {
-  document.getElementById('progressBar').style.display = show ? 'block' : 'none';
-  if (!show) document.getElementById('progressFill').style.width='0%';
-}
-function setProgress(pct) { document.getElementById('progressFill').style.width=(pct*100)+'%'; }
-function setStatus(msg) { document.getElementById('statusText').textContent=msg; }
-
-// ──────────────────────────────────────────────────────────────────────────
-// SESSION GENERATE — 1 variation per template per location
-// ──────────────────────────────────────────────────────────────────────────
-async function generateSession() {
-  const locs = getSelectedLocs();
-  const templates = mode === 'photo' ? photoTemplates : videoTemplates;
-  if (!templates.length) { setStatus('Upload templates first'); return; }
-
+async function generate() {
   const btn = document.getElementById('generateBtn');
-  btn.disabled = true; btn.textContent = 'Generating…';
-  generatedData = [];
-  showProgress(true);
+  btn.disabled = true;
 
-  const date      = document.getElementById('sessionDate').value.trim() || todayMMDDYYYY();
-  const product   = document.getElementById('sessionProduct').value.trim() || 'product';
-  const folderBase = `${date}_${product}`.replace(/\s+/g,'_');
+  const toProcess = files.filter(f => selectedIds.has(f.id));
+  results = [];
 
-  const total = locs.length * templates.length;
-  let done = 0;
-  const sessionGroups = [];
+  const total = toProcess.length * varCount;
+  let done  = 0;
 
-  for (const loc of locs) {
-    setStatus(`Generating: ${loc.name}…`);
-    const locVariations = [];
+  const progressWrap  = document.getElementById('progressWrap');
+  const progressFill  = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  progressWrap.classList.add('active');
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsArea').innerHTML = '';
 
-    for (let t = 0; t < templates.length; t++) {
-      const tpl = templates[t];
-      const seed = Math.floor(Math.random() * 99999);
-      const fileName = randFileName(mode === 'photo' ? 'jpg' : 'webm');
+  for (const f of toProcess) {
+    const blobs = [];
+    for (let i = 0; i < varCount; i++) {
+      progressLabel.textContent = `Processing ${f.name} — variant ${i+1}/${varCount}`;
+      progressFill.style.width = (done / total * 100) + '%';
 
-      if (mode === 'photo') {
-        const canvas = await applyPhotoVar(tpl.img, seed);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-        locVariations.push({ dataUrl, fileName, thumb: dataUrl, label: fileName });
+      if (f.isVideo) {
+        blobs.push({ blob: f.file, ext: f.name.split('.').pop() });
       } else {
-        const blob = await renderVideoVar(tpl.blob, seed);
-        const url  = URL.createObjectURL(blob);
-        locVariations.push({ url, blob, fileName, thumb: null, label: fileName });
+        const blob = await shiftImage(f.file);
+        blobs.push({ blob, ext: 'jpg' });
       }
       done++;
-      setProgress(done / total);
-      await sleep(8);
+      await sleep(10);
     }
-
-    const folderName = loc.name.replace(/[^a-zA-Z0-9]/g,'_');
-    sessionGroups.push({ locName: loc.name, folderName, variations: locVariations });
-    generatedData.push({ name: loc.name, folderName, variations: locVariations, type: mode });
+    results.push({ sourceId: f.id, sourceName: f.name, blobs, isVideo: f.isVideo });
   }
 
-  renderSessionOutput(sessionGroups, folderBase);
-  btn.disabled = false; btn.textContent = 'Generate Variations →';
-  showProgress(false);
-  setStatus(`✓ ${total} files ready — ${locs.length} locations`);
-  document.getElementById('contentTitle').textContent = `${folderBase}/`;
-  showZipBtn(folderBase, true);
+  progressFill.style.width = '100%';
+  progressLabel.textContent = 'Done ✓';
+  setTimeout(() => progressWrap.classList.remove('active'), 1200);
+
+  renderResults();
+  btn.disabled = false;
 }
 
-function renderSessionOutput(groups, folderBase) {
-  const area = document.getElementById('outputArea');
-  area.innerHTML = groups.map((g, gi) => `
-    <div class="loc-group">
-      <div class="loc-group-header">
-        <div class="loc-group-pill">📁 ${folderBase}/${g.folderName}/</div>
-        <span style="font-size:0.62rem;color:var(--muted);margin-left:auto;">${g.variations.length} file${g.variations.length!==1?'s':''}</span>
-        <button class="zip-btn" style="padding:4px 12px;font-size:0.62rem;" onclick="downloadLocFolder(${gi})">⬇ Folder</button>
-      </div>
-      <div class="variations-grid">
-        ${g.variations.map((v,vi) => `
-          <div class="variation-card">
-            ${v.thumb
-              ? `<img src="${v.thumb}" loading="lazy">`
-              : `<video src="${v.url}" muted loop autoplay playsinline></video>`}
-            <div class="variation-footer">
-              <span class="variation-tag" style="font-size:0.5rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;">${v.fileName}</span>
-              <button class="dl-btn" onclick="downloadSessionFile(${gi},${vi})">↓</button>
-            </div>
-          </div>`).join('')}
-      </div>
-    </div>`).join('');
-}
-
-window.downloadSessionFile = function(gi, vi) {
-  const g = generatedData[gi], v = g.variations[vi];
-  const a = document.createElement('a');
-  if (g.type==='photo') { a.href=v.dataUrl; a.download=randFileName('jpg'); }
-  else                  { a.href=v.url;     a.download=randFileName('webm'); }
-  a.click();
-};
-
-window.downloadLocFolder = async function(gi) {
-  const g = generatedData[gi];
-  for (let vi=0; vi<g.variations.length; vi++) { downloadSessionFile(gi,vi); await sleep(160); }
-};
-
-async function downloadZip() {
-  const btn = document.getElementById('zipBtn');
-  const folderBase = btn.dataset.folder || 'photos';
-
-  if (!generatedData.length) { setStatus('Nothing to save'); return; }
-
-  // Figure out how many variation sets we have
-  // (all templates should have same count — use first template's count)
-  const varSetCount = generatedData[0].variations.length;
-  const templateCount = generatedData.length;
-
-  // Use File System Access API if available (Chrome/Chromebook)
-  if (window.showDirectoryPicker) {
-    try {
-      btn.textContent = '📁 Pick parent folder…'; btn.disabled = true;
-
-      const rootHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-      btn.textContent = '⏳ Saving…';
-
-      // Create one subfolder per variation set
-      // Each subfolder gets variation[i] from every template
-      for (let i = 0; i < varSetCount; i++) {
-        const folderName = `${folderBase}_set${i + 1}`;
-        const subDir = await rootHandle.getDirectoryHandle(folderName, { create: true });
-
-        for (const g of generatedData) {
-          const v  = g.variations[i];
-          if (!v) continue;
-          const fn = randFileName(g.type === 'photo' ? 'jpg' : 'webm');
-          const fileHandle = await subDir.getFileHandle(fn, { create: true });
-          const writable   = await fileHandle.createWritable();
-
-          if (g.type === 'photo' && v.dataUrl) {
-            const blob = await (await fetch(v.dataUrl)).blob();
-            await writable.write(blob);
-          } else if (g.type === 'video' && v.url) {
-            const blob = await (await fetch(v.url)).blob();
-            await writable.write(blob);
+// ─── EXIF ORIENTATION ────────────────────────────────────────────────────────
+function getExifOrientation(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const view = new DataView(e.target.result);
+      if (view.getUint16(0, false) !== 0xFFD8) return resolve(1);
+      let offset = 2;
+      while (offset < view.byteLength) {
+        const marker = view.getUint16(offset, false);
+        offset += 2;
+        if (marker === 0xFFE1) {
+          if (view.getUint32(offset += 2, false) !== 0x45786966) return resolve(1);
+          const little = view.getUint16(offset += 6, false) === 0x4949;
+          offset += view.getUint32(offset + 4, little);
+          const tags = view.getUint16(offset, little);
+          offset += 2;
+          for (let i = 0; i < tags; i++) {
+            if (view.getUint16(offset + i * 12, little) === 0x0112) {
+              return resolve(view.getUint16(offset + i * 12 + 8, little));
+            }
           }
-          await writable.close();
-        }
+        } else if ((marker & 0xFF00) !== 0xFF00) break;
+        else offset += view.getUint16(offset, false);
+      }
+      resolve(1);
+    };
+    reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
+  });
+}
 
-        setStatus(`Saved set ${i + 1} of ${varSetCount}`);
+// ─── IMAGE SHIFT ──────────────────────────────────────────────────────────────
+function shiftImage(file) {
+  return new Promise(async resolve => {
+    const orientation = await getExifOrientation(file);
+    const img = new Image();
+    img.onload = () => {
+      const intensity  = parseInt(intensitySlider.value) / 100;
+      const doFlip     = document.getElementById('tFlip').checked;
+      const doRotate   = document.getElementById('tRotate').checked;
+      const doCrop     = document.getElementById('tCrop').checked;
+      const doBright   = document.getElementById('tBright').checked;
+      const doContrast = document.getElementById('tContrast').checked;
+      const doSat      = document.getElementById('tSat').checked;
+
+      const flip     = doFlip    ? (Math.random() > 0.5 ? -1 : 1) : 1;
+      const angle    = doRotate  ? (Math.random() - 0.5) * 4 * intensity : 0;
+      const zoom     = doCrop    ? 1 + Math.random() * 0.08 * intensity * 2 : 1;
+      const bright   = doBright  ? 0.88 + Math.random() * 0.24 * intensity * 2 : 1;
+      const contrast = doContrast? 0.9  + Math.random() * 0.2  * intensity * 2 : 1;
+      const sat      = doSat     ? 0.85 + Math.random() * 0.3  * intensity * 2 : 1;
+
+      // Swap dimensions for rotated EXIF orientations (5-8)
+      const swapped = orientation >= 5 && orientation <= 8;
+      const w = swapped ? img.naturalHeight : img.naturalWidth;
+      const h = swapped ? img.naturalWidth  : img.naturalHeight;
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.filter = `brightness(${bright}) contrast(${contrast}) saturate(${sat})`;
+      ctx.save();
+
+      // Apply EXIF correction first
+      ctx.translate(w / 2, h / 2);
+      switch (orientation) {
+        case 2: ctx.scale(-1, 1); break;
+        case 3: ctx.rotate(Math.PI); break;
+        case 4: ctx.scale(1, -1); break;
+        case 5: ctx.rotate(Math.PI / 2); ctx.scale(1, -1); break;
+        case 6: ctx.rotate(Math.PI / 2); break;
+        case 7: ctx.rotate(-Math.PI / 2); ctx.scale(1, -1); break;
+        case 8: ctx.rotate(-Math.PI / 2); break;
+      }
+      // Then apply our transforms
+      ctx.scale(flip * zoom, zoom);
+      ctx.rotate(angle * Math.PI / 180);
+      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+      ctx.restore();
+
+      canvas.toBlob(blob => resolve({ blob, ext: 'jpg' }), 'image/jpeg', 0.92);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+// ─── RENDER RESULTS ───────────────────────────────────────────────────────────
+function renderResults() {
+  const area   = document.getElementById('resultsArea');
+  const folder = document.getElementById('folderName').value.trim() || 'photoshift';
+  area.innerHTML = '';
+
+  // Download All button
+  const header = document.createElement('div');
+  header.className = 'results-header';
+  header.innerHTML = `
+    <div>
+      <div class="results-title">Generated Variations</div>
+      <div class="results-meta">${results.length} source${results.length !== 1 ? 's' : ''} × ${varCount} variants = ${results.length * varCount} files</div>
+    </div>
+    <button class="download-all-btn" id="downloadAllBtn">⬇ Download All (ZIP)</button>`;
+  area.appendChild(header);
+
+  header.querySelector('#downloadAllBtn').addEventListener('click', () => downloadAll(folder));
+
+  // Per-source sections
+  results.forEach(r => {
+    const baseName = r.sourceName.replace(/\.[^.]+$/, '');
+    const section  = document.createElement('div');
+
+    const sec_header = document.createElement('div');
+    sec_header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;';
+    sec_header.innerHTML = `
+      <div style="font-size:0.7rem;color:var(--muted)">${r.sourceName}</div>
+      <button class="dl-btn" style="font-size:0.62rem;padding:4px 10px;" data-src="${r.sourceId}">⬇ this batch</button>`;
+    sec_header.querySelector('button').addEventListener('click', () => downloadBatch(r, folder, baseName));
+    section.appendChild(sec_header);
+
+    const grid = document.createElement('div');
+    grid.className = 'variants-grid';
+
+    r.blobs.forEach((b, i) => {
+      const card = document.createElement('div');
+      card.className = 'variant-card';
+      const fname = randomFilename(folder, baseName, i);
+
+      if (r.isVideo) {
+        card.innerHTML = `
+          <div class="variant-preview video-preview">🎬</div>
+          <div class="variant-footer">
+            <span class="variant-num">v${i+1}</span>
+            <button class="dl-btn">Save</button>
+          </div>`;
+      } else {
+        const url = URL.createObjectURL(b.blob);
+        card.innerHTML = `
+          <img class="variant-preview" src="${url}" alt="v${i+1}">
+          <div class="variant-footer">
+            <span class="variant-num">v${i+1}</span>
+            <button class="dl-btn">Save</button>
+          </div>`;
       }
 
-      const total = varSetCount * templateCount;
-      btn.textContent = '⬇ Save to Folder'; btn.disabled = false;
-      setStatus(`✓ ${varSetCount} folders, ${total} files total`);
-      setHdrStatus(`✓ Done — ${varSetCount} listing sets saved`);
-
-    } catch (err) {
-      btn.textContent = '⬇ Save to Folder'; btn.disabled = false;
-      if (err.name !== 'AbortError') fallbackSequentialDownload();
-    }
-
-  } else {
-    fallbackSequentialDownload();
-  }
-}
-
-async function fallbackSequentialDownload() {
-  // Fallback: sequential downloads grouped by set
-  const varSetCount = generatedData[0]?.variations.length || 1;
-  let n = 0;
-  for (let i = 0; i < varSetCount; i++) {
-    for (const g of generatedData) {
-      const v  = g.variations[i];
-      if (!v) continue;
-      const a  = document.createElement('a');
-      const fn = randFileName(g.type === 'photo' ? 'jpg' : 'webm');
-      if (g.type === 'photo' && v.dataUrl) { a.href = v.dataUrl; a.download = fn; }
-      else if (g.type === 'video' && v.url) { a.href = v.url;     a.download = fn; }
-      else continue;
-      a.click();
-      await sleep(250);
-      n++;
-    }
-  }
-  setStatus(`✓ ${n} files downloaded`);
-}
-
-// ─── EXPORT / IMPORT ───────────────────────────────────────────────────────
-function exportPhotoTemplates() {
-  if (!photoTemplates.length) {
-    alert('No photo templates to export yet.');
-    return;
-  }
-  const payload = {
-    version: 1,
-    exported: new Date().toISOString(),
-    app: 'ListingShift',
-    templates: photoTemplates.map(t => ({ name: t.name, src: t.src }))
-  };
-  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `listingshift-templates-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  setHdrStatus('✓ Exported ' + photoTemplates.length + ' templates');
-}
-
-function triggerPhotoImport() {
-  document.getElementById('photoImportInput').click();
-}
-
-function importPhotoTemplates(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.templates || !Array.isArray(data.templates)) {
-        alert('This doesn\'t look like a ListingShift template backup.');
-        return;
-      }
-      const existing = new Set(photoTemplates.map(t => t.name));
-      let added = 0;
-      let pending = data.templates.length;
-
-      if (pending === 0) { setHdrStatus('Nothing to import'); return; }
-
-      data.templates.forEach(td => {
-        const img = new Image();
-        img.onload = () => {
-          if (!existing.has(td.name)) {
-            photoTemplates.push({ name: td.name, src: td.src, img, saved: false });
-            added++;
-          }
-          pending--;
-          if (pending === 0) {
-            savePhotoTemplates();
-            renderTemplateList();
-            updateGenerateBtn();
-            setHdrStatus(`✓ Imported ${added} template${added!==1?'s':''}`);
-          }
-        };
-        img.onerror = () => { pending--; if(pending===0){ renderTemplateList(); } };
-        img.src = td.src;
+      card.querySelector('.dl-btn').addEventListener('click', () => {
+        triggerDownload(b.blob, fname + '.' + b.ext);
       });
-    } catch(err) {
-      alert('Failed to read file: ' + err.message);
-    }
-    input.value = '';
-  };
-  reader.readAsText(file);
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    area.appendChild(section);
+  });
 }
 
-function setHdrStatus(msg) {
-  const el = document.getElementById('hdrStatus');
-  el.textContent = msg;
-  setTimeout(() => el.textContent = '', 3000);
+// ─── DOWNLOAD HELPERS ────────────────────────────────────────────────────────
+function randomFilename(folder, base, idx) {
+  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `${folder}_${base}_v${idx+1}_${suffix}`;
 }
 
-// ─── INIT ──────────────────────────────────────────────────────────────────
-loadPhotoTemplates();
-loadSessionLocs();
-document.getElementById('sessionDate').value = todayMMDDYYYY();
-renderSessionLocList();
+function triggerDownload(blob, filename) {
+  const a   = document.createElement('a');
+  a.href    = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+async function downloadBatch(r, folder, baseName) {
+  for (let i = 0; i < r.blobs.length; i++) {
+    const b = r.blobs[i];
+    const fname = randomFilename(folder, baseName, i) + '.' + b.ext;
+    triggerDownload(b.blob, fname);
+    await sleep(120);
+  }
+}
+
+async function downloadAll(folder) {
+  for (const r of results) {
+    const baseName = r.sourceName.replace(/\.[^.]+$/, '');
+    await downloadBatch(r, folder, baseName);
+    await sleep(200);
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
