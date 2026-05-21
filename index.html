@@ -18,885 +18,607 @@
     --blue: #5c9fe0;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    min-height: 100vh;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; min-height: 100vh; }
 
-  /* HEADER */
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 100;
-  }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: var(--accent);
-    letter-spacing: -0.02em;
-  }
-  .logo span { color: var(--muted); font-weight: 700; }
-  .version-badge {
-    font-size: 0.6rem;
-    color: var(--accent);
-    background: rgba(232,197,71,0.1);
-    border: 1px solid rgba(232,197,71,0.2);
-    padding: 2px 7px;
-    border-radius: 4px;
-    letter-spacing: 0.05em;
-  }
+  .header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 100; }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--accent); letter-spacing: -0.02em; }
+  .logo span { color: var(--muted); }
+  .vbadge { font-size: 0.58rem; color: var(--accent); background: rgba(232,197,71,0.1); border: 1px solid rgba(232,197,71,0.2); padding: 2px 7px; border-radius: 4px; }
   .header-spacer { flex: 1; }
-  .save-status {
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-  }
 
-  /* LAYOUT */
-  .main {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    min-height: calc(100vh - 53px);
-  }
-  @media (max-width: 700px) {
-    .main { grid-template-columns: 1fr; }
-    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
-  }
+  .main { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 51px); }
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
 
-  /* SIDEBAR */
-  .sidebar {
-    border-right: 1px solid var(--border);
-    padding: 20px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .section-label {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
+  .sidebar { border-right: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: calc(100vh - 51px); }
+  .slabel { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
 
-  /* UPLOAD ZONE */
-  .upload-zone {
-    border: 1.5px dashed var(--border);
-    border-radius: 8px;
-    padding: 24px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--surface);
-  }
-  .upload-zone:hover, .upload-zone.dragover {
-    border-color: var(--accent);
-    background: rgba(232,197,71,0.04);
-  }
+  .upload-zone { border: 1.5px dashed var(--border); border-radius: 8px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface); }
+  .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: rgba(232,197,71,0.04); }
   .upload-zone input { display: none; }
-  .upload-icon { font-size: 1.6rem; margin-bottom: 8px; }
-  .upload-text { color: var(--muted); font-size: 0.7rem; line-height: 1.6; }
-  .upload-text strong { color: var(--accent); display: block; font-size: 0.75rem; }
+  .uz-icon { font-size: 1.4rem; margin-bottom: 6px; }
+  .uz-text { color: var(--muted); font-size: 0.68rem; line-height: 1.6; }
+  .uz-text strong { color: var(--accent); display: block; }
 
-  /* PRODUCT SHELF */
-  .product-shelf {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 240px;
-    overflow-y: auto;
-  }
-  .product-thumb {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-  }
-  .product-thumb:hover { border-color: var(--accent); }
-  .product-thumb.selected { border-color: var(--accent); background: rgba(232,197,71,0.06); }
-  .product-thumb img {
-    width: 38px;
-    height: 38px;
-    object-fit: cover;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-  .product-thumb .vid-thumb {
-    width: 38px;
-    height: 38px;
-    background: var(--bg);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-  .product-info { flex: 1; min-width: 0; }
-  .product-name {
-    font-size: 0.72rem;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .product-meta { font-size: 0.6rem; color: var(--muted); }
-  .product-del {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 0.8rem;
-    padding: 2px 5px;
-    border-radius: 3px;
-    display: none;
-  }
-  .product-thumb:hover .product-del { display: block; }
-  .product-del:hover { color: var(--red); background: rgba(224,92,92,0.1); }
+  .product-shelf { display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; }
+  .pt { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all 0.15s; position: relative; }
+  .pt:hover { border-color: var(--accent); }
+  .pt.selected { border-color: var(--accent); background: rgba(232,197,71,0.06); }
+  .pt img, .pt .vt { width: 34px; height: 34px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+  .pt .vt { background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  .pt-info { flex: 1; min-width: 0; }
+  .pt-name { font-size: 0.68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pt-meta { font-size: 0.58rem; color: var(--muted); }
+  .pt-del { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); color: var(--muted); cursor: pointer; font-size: 0.75rem; padding: 2px 4px; border-radius: 3px; display: none; }
+  .pt:hover .pt-del { display: block; }
+  .pt-del:hover { color: var(--red); }
 
-  /* CONTROLS */
-  .control-group { display: flex; flex-direction: column; gap: 8px; }
-  .control-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .control-label { color: var(--muted); font-size: 0.68rem; }
-  .toggle {
-    position: relative;
-    width: 32px;
-    height: 18px;
-    cursor: pointer;
-  }
+  .ctrl-group { display: flex; flex-direction: column; gap: 7px; }
+  .ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ctrl-lbl { color: var(--muted); font-size: 0.65rem; }
+  .toggle { position: relative; width: 30px; height: 17px; cursor: pointer; flex-shrink: 0; }
   .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-track {
-    position: absolute;
-    inset: 0;
-    background: var(--border);
-    border-radius: 9px;
-    transition: 0.2s;
-  }
-  .toggle input:checked + .toggle-track { background: var(--accent); }
-  .toggle-thumb {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 50%;
-    transition: 0.2s;
-    pointer-events: none;
-  }
-  .toggle input:checked ~ .toggle-thumb { transform: translateX(14px); }
+  .ttrack { position: absolute; inset: 0; background: var(--border); border-radius: 9px; transition: 0.2s; }
+  .toggle input:checked + .ttrack { background: var(--accent); }
+  .tthumb { position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; background: white; border-radius: 50%; transition: 0.2s; pointer-events: none; }
+  .toggle input:checked ~ .tthumb { transform: translateX(13px); }
 
-  .slider-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
-  .slider-wrap input[type=range] {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    outline: none;
-  }
-  .slider-wrap input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
-    background: var(--accent);
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  .slider-val { color: var(--accent); font-size: 0.65rem; min-width: 28px; text-align: right; }
+  .sld-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .sld-wrap input[type=range] { flex: 1; -webkit-appearance: none; height: 3px; background: var(--border); border-radius: 2px; outline: none; }
+  .sld-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+  .sld-val { color: var(--accent); font-size: 0.62rem; min-width: 26px; text-align: right; }
 
-  /* VARIATION COUNT */
-  .var-btns {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-  }
-  .var-btn {
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .var-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .var-btn.active { border-color: var(--accent); background: rgba(232,197,71,0.1); color: var(--accent); }
+  .var-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+  .vbtn { padding: 5px 9px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.65rem; cursor: pointer; transition: all 0.15s; }
+  .vbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .vbtn.active { border-color: var(--accent); background: rgba(232,197,71,0.1); color: var(--accent); }
 
-  /* FOLDER NAME */
-  .folder-input {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 10px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .folder-input:focus { border-color: var(--accent); }
+  /* SESSION / FOLDER PANEL */
+  .session-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .sess-row { display: flex; gap: 8px; }
+  .sess-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .sess-field label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .sess-input { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 6px 9px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.72rem; outline: none; width: 100%; transition: border-color 0.15s; }
+  .sess-input:focus { border-color: var(--accent); }
+  .folder-preview { font-size: 0.62rem; color: var(--accent); background: rgba(232,197,71,0.07); border-radius: 4px; padding: 5px 8px; word-break: break-all; }
 
-  /* GENERATE BTN */
-  .generate-btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--accent);
-    color: #0f0f11;
-    border: none;
-    border-radius: 7px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .generate-btn:hover { background: #f0d060; transform: translateY(-1px); }
-  .generate-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+  /* LOCATIONS */
+  .loc-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+  .loc-item { display: flex; align-items: center; gap: 7px; padding: 5px 8px; border-radius: 5px; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; font-size: 0.68rem; user-select: none; }
+  .loc-item:hover { border-color: var(--border); }
+  .loc-item.checked { border-color: rgba(76,175,125,0.4); background: rgba(76,175,125,0.07); color: var(--green); }
+  .loc-item .loc-check { width: 14px; height: 14px; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
+  .loc-item.checked .loc-check { background: var(--green); border-color: var(--green); color: #0f0f11; }
+  .loc-del { margin-left: auto; color: var(--muted); font-size: 0.7rem; padding: 1px 4px; }
+  .loc-del:hover { color: var(--red); }
+  .add-loc-row { display: flex; gap: 6px; }
+  .add-loc-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 6px 8px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.68rem; outline: none; }
+  .add-loc-input:focus { border-color: var(--accent); }
+  .add-loc-btn { padding: 5px 10px; background: transparent; border: 1px solid var(--border); border-radius: 5px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .add-loc-btn:hover { border-color: var(--green); color: var(--green); }
 
-  /* MAIN PANEL */
-  .panel {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+  .gen-btn { width: 100%; padding: 11px; background: var(--accent); color: #0f0f11; border: none; border-radius: 7px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
+  .gen-btn:hover { background: #f0d060; }
+  .gen-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
-  /* EMPTY STATE */
-  .empty-state {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    color: var(--muted);
-    text-align: center;
-    padding: 60px 20px;
-  }
-  .empty-icon { font-size: 3rem; opacity: 0.3; }
-  .empty-text { font-size: 0.75rem; line-height: 1.7; max-width: 280px; }
+  .panel { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--muted); text-align: center; padding: 60px 20px; }
+  .empty-icon { font-size: 2.5rem; opacity: 0.3; }
+  .empty-text { font-size: 0.72rem; line-height: 1.7; max-width: 280px; }
 
-  /* RESULTS GRID */
-  .results-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .results-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-  }
-  .results-meta { color: var(--muted); font-size: 0.65rem; }
+  .prog-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; display: none; }
+  .prog-wrap.active { display: block; }
+  .prog-lbl { font-size: 0.65rem; color: var(--muted); margin-bottom: 8px; }
+  .prog-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.2s; width: 0%; }
 
-  .download-all-btn {
-    padding: 7px 14px;
-    background: var(--green);
-    color: #0f0f11;
-    border: none;
-    border-radius: 6px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .download-all-btn:hover { background: #5dc98a; }
+  .results-hdr { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .results-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .results-meta { color: var(--muted); font-size: 0.62rem; }
+  .save-folder-btn { padding: 8px 16px; background: var(--green); color: #0f0f11; border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; }
+  .save-folder-btn:hover { background: #5dc98a; }
+  .save-folder-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
-  .variants-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 12px;
-  }
-  .variant-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: border-color 0.15s;
-  }
-  .variant-card:hover { border-color: var(--accent); }
-  .variant-preview {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    display: block;
-    background: var(--bg);
-  }
-  .variant-preview.video-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: var(--muted);
-  }
-  .variant-footer {
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-  }
-  .variant-num { color: var(--muted); font-size: 0.6rem; }
-  .dl-btn {
-    padding: 4px 9px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+  .loc-section { margin-top: 8px; }
+  .loc-section-title { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .variants-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .vcard { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+  .vcard img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+  .vcard-vid { width: 100%; aspect-ratio: 1; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--muted); }
+  .vcard-foot { padding: 6px 8px; display: flex; align-items: center; justify-content: space-between; }
+  .vcard-num { color: var(--muted); font-size: 0.58rem; }
+  .dl-btn { padding: 3px 8px; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.58rem; cursor: pointer; transition: all 0.15s; }
   .dl-btn:hover { border-color: var(--green); color: var(--green); }
 
-  /* PROGRESS */
-  .progress-bar-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 16px;
-    display: none;
-  }
-  .progress-bar-wrap.active { display: block; }
-  .progress-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 10px; }
-  .progress-track {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.2s;
-    width: 0%;
-  }
-
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="logo">Photo<span>Shift</span></div>
-  <div class="version-badge">v15</div>
+  <div class="vbadge">v16</div>
   <div class="header-spacer"></div>
-  <div class="save-status" id="saveStatus">ready</div>
 </div>
 
 <div class="main">
-
-  <!-- SIDEBAR -->
   <div class="sidebar">
 
     <!-- Upload -->
     <div>
-      <div class="section-label">Upload Files</div>
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="fileInput" accept="image/*,video/*" multiple>
-        <div class="upload-icon">📁</div>
-        <div class="upload-text">
-          <strong>Drop photos or videos here</strong>
-          or click to browse<br>
-          JPG, PNG, WEBP, MP4, MOV
-        </div>
+      <div class="slabel">Upload Photos / Videos</div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple onchange="handleFiles(this.files);this.value=''">
+        <div class="uz-icon">📁</div>
+        <div class="uz-text"><strong>Drop files here</strong>JPG, PNG, WEBP, MP4, MOV</div>
       </div>
     </div>
 
-    <!-- Product shelf -->
+    <!-- File shelf -->
     <div>
-      <div class="section-label">Uploaded Files (<span id="fileCount">0</span>)</div>
-      <div class="product-shelf" id="productShelf">
-        <!-- thumbs injected -->
-      </div>
+      <div class="slabel">Files (<span id="fileCount">0</span>) — click to toggle</div>
+      <div class="product-shelf" id="productShelf"></div>
     </div>
 
     <!-- Transforms -->
     <div>
-      <div class="section-label">Transforms</div>
-      <div class="control-group">
-        <div class="control-row">
-          <span class="control-label">Flip horizontal</span>
-          <label class="toggle">
-            <input type="checkbox" id="tFlip" checked>
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="control-row">
-          <span class="control-label">Micro rotation</span>
-          <label class="toggle">
-            <input type="checkbox" id="tRotate" checked>
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="control-row">
-          <span class="control-label">Crop / zoom</span>
-          <label class="toggle">
-            <input type="checkbox" id="tCrop" checked>
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="control-row">
-          <span class="control-label">Brightness</span>
-          <label class="toggle">
-            <input type="checkbox" id="tBright" checked>
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="control-row">
-          <span class="control-label">Contrast</span>
-          <label class="toggle">
-            <input type="checkbox" id="tContrast" checked>
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="control-row">
-          <span class="control-label">Saturation</span>
-          <label class="toggle">
-            <input type="checkbox" id="tSat" checked>
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
+      <div class="slabel">Transforms</div>
+      <div class="ctrl-group">
+        <div class="ctrl-row"><span class="ctrl-lbl">Flip horizontal</span><label class="toggle"><input type="checkbox" id="tFlip" checked><div class="ttrack"></div><div class="tthumb"></div></label></div>
+        <div class="ctrl-row"><span class="ctrl-lbl">Micro rotation</span><label class="toggle"><input type="checkbox" id="tRotate" checked><div class="ttrack"></div><div class="tthumb"></div></label></div>
+        <div class="ctrl-row"><span class="ctrl-lbl">Crop / zoom</span><label class="toggle"><input type="checkbox" id="tCrop" checked><div class="ttrack"></div><div class="tthumb"></div></label></div>
+        <div class="ctrl-row"><span class="ctrl-lbl">Brightness</span><label class="toggle"><input type="checkbox" id="tBright" checked><div class="ttrack"></div><div class="tthumb"></div></label></div>
+        <div class="ctrl-row"><span class="ctrl-lbl">Contrast</span><label class="toggle"><input type="checkbox" id="tContrast" checked><div class="ttrack"></div><div class="tthumb"></div></label></div>
+        <div class="ctrl-row"><span class="ctrl-lbl">Saturation</span><label class="toggle"><input type="checkbox" id="tSat" checked><div class="ttrack"></div><div class="tthumb"></div></label></div>
       </div>
     </div>
 
     <!-- Intensity -->
     <div>
-      <div class="section-label">Intensity</div>
-      <div class="control-row">
-        <span class="control-label">Shift amount</span>
-        <div class="slider-wrap">
-          <input type="range" id="intensity" min="5" max="60" value="20">
-          <span class="slider-val" id="intensityVal">20%</span>
+      <div class="slabel">Intensity</div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Shift amount</span>
+        <div class="sld-wrap">
+          <input type="range" id="intensity" min="5" max="60" value="20" oninput="document.getElementById('intensityVal').textContent=this.value+'%'">
+          <span class="sld-val" id="intensityVal">20%</span>
         </div>
       </div>
     </div>
 
-    <!-- Variation count -->
+    <!-- Variations per location -->
     <div>
-      <div class="section-label">Variations per file</div>
+      <div class="slabel">Variations per location</div>
       <div class="var-btns" id="varBtns">
-        <button class="var-btn" data-n="1">1</button>
-        <button class="var-btn" data-n="3">3</button>
-        <button class="var-btn active" data-n="5">5</button>
-        <button class="var-btn" data-n="8">8</button>
-        <button class="var-btn" data-n="10">10</button>
+        <button class="vbtn active" data-n="1" onclick="setVar(1,this)">1</button>
+        <button class="vbtn" data-n="3" onclick="setVar(3,this)">3</button>
+        <button class="vbtn" data-n="5" onclick="setVar(5,this)">5</button>
+        <button class="vbtn" data-n="8" onclick="setVar(8,this)">8</button>
+        <button class="vbtn" data-n="10" onclick="setVar(10,this)">10</button>
       </div>
     </div>
 
-    <!-- Folder name -->
+    <!-- Session / Folder -->
     <div>
-      <div class="section-label">Download folder name</div>
-      <input type="text" class="folder-input" id="folderName" placeholder="e.g. planter-north" value="">
+      <div class="slabel">Session & Folder</div>
+      <div class="session-panel">
+        <div class="sess-row">
+          <div class="sess-field">
+            <label>Date</label>
+            <input type="text" class="sess-input" id="sessDate" placeholder="05202026" oninput="updateFolderPreview()">
+          </div>
+          <div class="sess-field">
+            <label>Product</label>
+            <input type="text" class="sess-input" id="sessProduct" placeholder="Planters" oninput="updateFolderPreview()">
+          </div>
+        </div>
+        <div class="folder-preview" id="folderPreview">05202026_Planters / Baltimore_N / img_xxx.jpg</div>
+      </div>
     </div>
 
-    <!-- Generate -->
-    <button class="generate-btn" id="generateBtn" disabled>Generate Variations →</button>
+    <!-- Locations -->
+    <div>
+      <div class="slabel">Locations (each gets its own folder)</div>
+      <div class="loc-list" id="locList"></div>
+      <div class="add-loc-row" style="margin-top:8px;">
+        <input type="text" class="add-loc-input" id="addLocInput" placeholder="Add location…" onkeydown="if(event.key==='Enter')addLocation()">
+        <button class="add-loc-btn" onclick="addLocation()">+ Add</button>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="generateBtn" disabled onclick="generate()">Generate →</button>
 
   </div>
 
-  <!-- MAIN PANEL -->
+  <!-- PANEL -->
   <div class="panel" id="panel">
-
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">🖼</div>
-      <div class="empty-text">
-        Upload photos or videos on the left, then hit <strong style="color:var(--accent)">Generate Variations</strong> to create uniquely shifted copies for each listing location.
-      </div>
+      <div class="empty-text">Upload files, set locations, hit <strong style="color:var(--accent)">Generate</strong>.<br><br>Each location gets its own folder of variations — one click saves everything organized.</div>
     </div>
-
-    <div class="progress-bar-wrap" id="progressWrap">
-      <div class="progress-label" id="progressLabel">Processing...</div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-lbl" id="progLbl">Processing...</div>
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
     </div>
-
     <div id="resultsArea"></div>
-
   </div>
 </div>
 
 <script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
-let files = [];       // {id, file, name, type, url, isVideo}
-let varCount = 5;
-let selectedIds = new Set();
-let results = [];     // {sourceId, sourceName, blobs}
+// ── STATE ──────────────────────────────────────────────────────────────────
+var files = [];
+var selectedIds = new Set();
+var varCount = 1;
+var results = []; // [{location, items:[{sourceId,sourceName,blob,ext,isVideo}]}]
 
-// ─── INTENSITY SLIDER ────────────────────────────────────────────────────────
-const intensitySlider = document.getElementById('intensity');
-const intensityVal    = document.getElementById('intensityVal');
-intensitySlider.addEventListener('input', () => {
-  intensityVal.textContent = intensitySlider.value + '%';
-});
+var DEFAULT_LOCS = ['Baltimore_N','Baltimore_S','Baltimore_E','Baltimore_W','Baltimore_Laurel','Winchester','Waynesboro','Rural'];
 
-// ─── VAR BUTTONS ─────────────────────────────────────────────────────────────
-document.getElementById('varBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.var-btn');
-  if (!btn) return;
-  document.querySelectorAll('.var-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  varCount = parseInt(btn.dataset.n);
-});
+// ── INIT ───────────────────────────────────────────────────────────────────
+(function init() {
+  // Date default
+  var now = new Date();
+  var mm = String(now.getMonth()+1).padStart(2,'0');
+  var dd = String(now.getDate()).padStart(2,'0');
+  var yyyy = now.getFullYear();
+  document.getElementById('sessDate').value = mm+dd+yyyy;
 
-// ─── UPLOAD ───────────────────────────────────────────────────────────────────
-const uploadZone = document.getElementById('uploadZone');
-const fileInput  = document.getElementById('fileInput');
+  // Load saved locations or use defaults
+  var saved = localStorage.getItem('ps_locations');
+  var locs = saved ? JSON.parse(saved) : DEFAULT_LOCS;
+  locs.forEach(function(l){ addLocationToList(l, true); });
 
-uploadZone.addEventListener('click', () => fileInput.click());
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
-  handleFiles([...e.dataTransfer.files]);
-});
-fileInput.addEventListener('change', () => handleFiles([...fileInput.files]));
+  updateFolderPreview();
+})();
 
-function handleFiles(newFiles) {
-  newFiles.forEach(f => {
+// ── LOCATIONS ──────────────────────────────────────────────────────────────
+function getLocations() {
+  var items = document.querySelectorAll('.loc-item');
+  return Array.from(items).map(function(el){ return { name: el.dataset.loc, checked: el.classList.contains('checked') }; });
+}
+function getCheckedLocs() {
+  return getLocations().filter(function(l){ return l.checked; }).map(function(l){ return l.name; });
+}
+function saveLocs() {
+  var all = getLocations().map(function(l){ return l.name; });
+  localStorage.setItem('ps_locations', JSON.stringify(all));
+}
+function addLocationToList(name, checked) {
+  var list = document.getElementById('locList');
+  var div = document.createElement('div');
+  div.className = 'loc-item' + (checked ? ' checked' : '');
+  div.dataset.loc = name;
+  div.innerHTML = '<div class="loc-check">' + (checked ? '✓' : '') + '</div><span>' + name + '</span><span class="loc-del" onclick="removeLoc(this,event)">✕</span>';
+  div.addEventListener('click', function(e){
+    if (e.target.classList.contains('loc-del')) return;
+    div.classList.toggle('checked');
+    var chk = div.querySelector('.loc-check');
+    chk.textContent = div.classList.contains('checked') ? '✓' : '';
+    saveLocs();
+    updateGenBtn();
+    updateFolderPreview();
+  });
+  list.appendChild(div);
+}
+function addLocation() {
+  var inp = document.getElementById('addLocInput');
+  var val = inp.value.trim().replace(/\s+/g,'_');
+  if (!val) return;
+  addLocationToList(val, true);
+  saveLocs();
+  inp.value = '';
+  updateGenBtn();
+}
+function removeLoc(el, e) {
+  e.stopPropagation();
+  el.closest('.loc-item').remove();
+  saveLocs();
+  updateGenBtn();
+}
+
+// ── FOLDER PREVIEW ─────────────────────────────────────────────────────────
+function updateFolderPreview() {
+  var date = document.getElementById('sessDate').value || 'DATE';
+  var prod = document.getElementById('sessProduct').value || 'Product';
+  var locs = getCheckedLocs();
+  var locName = locs.length ? locs[0] : 'Location';
+  document.getElementById('folderPreview').textContent = date+'_'+prod+' / '+locName+' / img_xxx.jpg';
+}
+
+// ── UPLOAD ─────────────────────────────────────────────────────────────────
+var uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', function(e){ e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', function(){ uploadZone.classList.remove('dragover'); });
+uploadZone.addEventListener('drop', function(e){ e.preventDefault(); uploadZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+function handleFiles(fileList) {
+  Array.from(fileList).forEach(function(f){
     if (!f.type.startsWith('image/') && !f.type.startsWith('video/')) return;
-    const id  = Math.random().toString(36).slice(2);
-    const url = URL.createObjectURL(f);
-    files.push({ id, file: f, name: f.name, type: f.type, url, isVideo: f.type.startsWith('video/') });
+    var id = Math.random().toString(36).slice(2);
+    var url = URL.createObjectURL(f);
+    files.push({ id:id, file:f, name:f.name, type:f.type, url:url, isVideo:f.type.startsWith('video/') });
     selectedIds.add(id);
   });
   renderShelf();
   updateGenBtn();
-  fileInput.value = '';
 }
 
 function renderShelf() {
-  const shelf = document.getElementById('productShelf');
+  var shelf = document.getElementById('productShelf');
   document.getElementById('fileCount').textContent = files.length;
   shelf.innerHTML = '';
-  files.forEach(f => {
-    const div = document.createElement('div');
-    div.className = 'product-thumb' + (selectedIds.has(f.id) ? ' selected' : '');
-    div.dataset.id = f.id;
-
+  files.forEach(function(f){
+    var div = document.createElement('div');
+    div.className = 'pt' + (selectedIds.has(f.id) ? ' selected' : '');
     if (f.isVideo) {
-      div.innerHTML = `
-        <div class="vid-thumb">🎬</div>
-        <div class="product-info">
-          <div class="product-name">${f.name}</div>
-          <div class="product-meta">video</div>
-        </div>
-        <span class="product-del" data-del="${f.id}">✕</span>`;
+      div.innerHTML = '<div class="vt">🎬</div><div class="pt-info"><div class="pt-name">'+f.name+'</div><div class="pt-meta">video</div></div><span class="pt-del">✕</span>';
     } else {
-      div.innerHTML = `
-        <img src="${f.url}" alt="">
-        <div class="product-info">
-          <div class="product-name">${f.name}</div>
-          <div class="product-meta">photo</div>
-        </div>
-        <span class="product-del" data-del="${f.id}">✕</span>`;
+      div.innerHTML = '<img src="'+f.url+'" alt=""><div class="pt-info"><div class="pt-name">'+f.name+'</div><div class="pt-meta">photo</div></div><span class="pt-del">✕</span>';
     }
-
-    div.addEventListener('click', e => {
-      if (e.target.dataset.del) return;
-      if (selectedIds.has(f.id)) selectedIds.delete(f.id);
-      else selectedIds.add(f.id);
+    div.querySelector('.pt-del').addEventListener('click', function(e){
+      e.stopPropagation();
+      files = files.filter(function(x){ return x.id !== f.id; });
+      selectedIds.delete(f.id);
+      renderShelf(); updateGenBtn();
+    });
+    div.addEventListener('click', function(e){
+      if (e.target.classList.contains('pt-del')) return;
+      if (selectedIds.has(f.id)) selectedIds.delete(f.id); else selectedIds.add(f.id);
       div.classList.toggle('selected');
       updateGenBtn();
     });
-
-    div.querySelector('.product-del').addEventListener('click', e => {
-      e.stopPropagation();
-      files = files.filter(x => x.id !== f.id);
-      selectedIds.delete(f.id);
-      renderShelf();
-      updateGenBtn();
-    });
-
     shelf.appendChild(div);
   });
 }
 
 function updateGenBtn() {
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = selectedIds.size === 0;
+  var locs = getCheckedLocs();
+  var hasFiles = selectedIds.size > 0;
+  var hasLocs = locs.length > 0;
+  document.getElementById('generateBtn').disabled = !(hasFiles && hasLocs);
 }
 
-// ─── GENERATE ─────────────────────────────────────────────────────────────────
-document.getElementById('generateBtn').addEventListener('click', generate);
-
-async function generate() {
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-
-  const toProcess = files.filter(f => selectedIds.has(f.id));
-  results = [];
-
-  const total = toProcess.length * varCount;
-  let done  = 0;
-
-  const progressWrap  = document.getElementById('progressWrap');
-  const progressFill  = document.getElementById('progressFill');
-  const progressLabel = document.getElementById('progressLabel');
-  progressWrap.classList.add('active');
-  document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('resultsArea').innerHTML = '';
-
-  for (const f of toProcess) {
-    const blobs = [];
-    for (let i = 0; i < varCount; i++) {
-      progressLabel.textContent = `Processing ${f.name} — variant ${i+1}/${varCount}`;
-      progressFill.style.width = (done / total * 100) + '%';
-
-      if (f.isVideo) {
-        blobs.push({ blob: f.file, ext: f.name.split('.').pop() });
-      } else {
-        const blob = await shiftImage(f.file);
-        blobs.push({ blob, ext: 'jpg' });
-      }
-      done++;
-      await sleep(10);
-    }
-    results.push({ sourceId: f.id, sourceName: f.name, blobs, isVideo: f.isVideo });
-  }
-
-  progressFill.style.width = '100%';
-  progressLabel.textContent = 'Done ✓';
-  setTimeout(() => progressWrap.classList.remove('active'), 1200);
-
-  renderResults();
-  btn.disabled = false;
+function setVar(n, btn) {
+  varCount = n;
+  document.querySelectorAll('.vbtn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
 }
 
-// ─── EXIF ORIENTATION ────────────────────────────────────────────────────────
+// ── EXIF ORIENTATION ───────────────────────────────────────────────────────
 function getExifOrientation(file) {
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const view = new DataView(e.target.result);
-      if (view.getUint16(0, false) !== 0xFFD8) return resolve(1);
-      let offset = 2;
+  return new Promise(function(resolve){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var view = new DataView(e.target.result);
+      if (view.getUint16(0,false) !== 0xFFD8) return resolve(1);
+      var offset = 2;
       while (offset < view.byteLength) {
-        const marker = view.getUint16(offset, false);
-        offset += 2;
+        var marker = view.getUint16(offset,false); offset += 2;
         if (marker === 0xFFE1) {
-          if (view.getUint32(offset += 2, false) !== 0x45786966) return resolve(1);
-          const little = view.getUint16(offset += 6, false) === 0x4949;
-          offset += view.getUint32(offset + 4, little);
-          const tags = view.getUint16(offset, little);
-          offset += 2;
-          for (let i = 0; i < tags; i++) {
-            if (view.getUint16(offset + i * 12, little) === 0x0112) {
-              return resolve(view.getUint16(offset + i * 12 + 8, little));
-            }
+          if (view.getUint32(offset+=2,false) !== 0x45786966) return resolve(1);
+          var little = view.getUint16(offset+=6,false) === 0x4949;
+          offset += view.getUint32(offset+4,little);
+          var tags = view.getUint16(offset,little); offset += 2;
+          for (var i=0;i<tags;i++) {
+            if (view.getUint16(offset+i*12,little)===0x0112) return resolve(view.getUint16(offset+i*12+8,little));
           }
-        } else if ((marker & 0xFF00) !== 0xFF00) break;
-        else offset += view.getUint16(offset, false);
+        } else if ((marker&0xFF00)!==0xFF00) break;
+        else offset += view.getUint16(offset,false);
       }
       resolve(1);
     };
-    reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
+    reader.readAsArrayBuffer(file.slice(0,65536));
   });
 }
 
-// ─── IMAGE SHIFT ──────────────────────────────────────────────────────────────
+// ── IMAGE PROCESSING ───────────────────────────────────────────────────────
 function shiftImage(file) {
-  return new Promise(async resolve => {
-    const orientation = await getExifOrientation(file);
-    const img = new Image();
-    img.onload = () => {
-      const intensity  = parseInt(intensitySlider.value) / 100;
-      const doFlip     = document.getElementById('tFlip').checked;
-      const doRotate   = document.getElementById('tRotate').checked;
-      const doCrop     = document.getElementById('tCrop').checked;
-      const doBright   = document.getElementById('tBright').checked;
-      const doContrast = document.getElementById('tContrast').checked;
-      const doSat      = document.getElementById('tSat').checked;
+  return new Promise(function(resolve){
+    getExifOrientation(file).then(function(orientation){
+      var img = new Image();
+      img.onload = function(){
+        var intensity  = parseInt(document.getElementById('intensity').value)/100;
+        var doFlip     = document.getElementById('tFlip').checked;
+        var doRotate   = document.getElementById('tRotate').checked;
+        var doCrop     = document.getElementById('tCrop').checked;
+        var doBright   = document.getElementById('tBright').checked;
+        var doContrast = document.getElementById('tContrast').checked;
+        var doSat      = document.getElementById('tSat').checked;
 
-      const flip     = doFlip    ? (Math.random() > 0.5 ? -1 : 1) : 1;
-      const angle    = doRotate  ? (Math.random() - 0.5) * 4 * intensity : 0;
-      const zoom     = doCrop    ? 1 + Math.random() * 0.08 * intensity * 2 : 1;
-      const bright   = doBright  ? 0.88 + Math.random() * 0.24 * intensity * 2 : 1;
-      const contrast = doContrast? 0.9  + Math.random() * 0.2  * intensity * 2 : 1;
-      const sat      = doSat     ? 0.85 + Math.random() * 0.3  * intensity * 2 : 1;
+        var flip     = doFlip    ? (Math.random()>0.5?-1:1) : 1;
+        var angle    = doRotate  ? (Math.random()-0.5)*4*intensity : 0;
+        var zoom     = doCrop    ? 1+Math.random()*0.08*intensity*2 : 1;
+        var bright   = doBright  ? 0.88+Math.random()*0.24*intensity*2 : 1;
+        var contrast = doContrast? 0.9+Math.random()*0.2*intensity*2  : 1;
+        var sat      = doSat     ? 0.85+Math.random()*0.3*intensity*2 : 1;
 
-      // Swap dimensions for rotated EXIF orientations (5-8)
-      const swapped = orientation >= 5 && orientation <= 8;
-      const w = swapped ? img.naturalHeight : img.naturalWidth;
-      const h = swapped ? img.naturalWidth  : img.naturalHeight;
+        var swapped = orientation>=5 && orientation<=8;
+        var w = swapped ? img.naturalHeight : img.naturalWidth;
+        var h = swapped ? img.naturalWidth  : img.naturalHeight;
 
-      const canvas = document.createElement('canvas');
-      canvas.width  = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-
-      ctx.filter = `brightness(${bright}) contrast(${contrast}) saturate(${sat})`;
-      ctx.save();
-
-      // Apply EXIF correction first
-      ctx.translate(w / 2, h / 2);
-      switch (orientation) {
-        case 2: ctx.scale(-1, 1); break;
-        case 3: ctx.rotate(Math.PI); break;
-        case 4: ctx.scale(1, -1); break;
-        case 5: ctx.rotate(Math.PI / 2); ctx.scale(1, -1); break;
-        case 6: ctx.rotate(Math.PI / 2); break;
-        case 7: ctx.rotate(-Math.PI / 2); ctx.scale(1, -1); break;
-        case 8: ctx.rotate(-Math.PI / 2); break;
-      }
-      // Then apply our transforms
-      ctx.scale(flip * zoom, zoom);
-      ctx.rotate(angle * Math.PI / 180);
-      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
-      ctx.restore();
-
-      canvas.toBlob(blob => resolve({ blob, ext: 'jpg' }), 'image/jpeg', 0.92);
-    };
-    img.src = URL.createObjectURL(file);
+        var canvas = document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        var ctx = canvas.getContext('2d');
+        ctx.filter='brightness('+bright+') contrast('+contrast+') saturate('+sat+')';
+        ctx.save();
+        ctx.translate(w/2,h/2);
+        if(orientation===2){ctx.scale(-1,1);}
+        else if(orientation===3){ctx.rotate(Math.PI);}
+        else if(orientation===4){ctx.scale(1,-1);}
+        else if(orientation===5){ctx.rotate(Math.PI/2);ctx.scale(1,-1);}
+        else if(orientation===6){ctx.rotate(Math.PI/2);}
+        else if(orientation===7){ctx.rotate(-Math.PI/2);ctx.scale(1,-1);}
+        else if(orientation===8){ctx.rotate(-Math.PI/2);}
+        ctx.scale(flip*zoom,zoom);
+        ctx.rotate(angle*Math.PI/180);
+        ctx.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+        ctx.restore();
+        canvas.toBlob(function(blob){ resolve({blob:blob,ext:'jpg'}); },'image/jpeg',0.92);
+      };
+      img.src = URL.createObjectURL(file);
+    });
   });
 }
 
-// ─── RENDER RESULTS ───────────────────────────────────────────────────────────
-function renderResults() {
-  const area   = document.getElementById('resultsArea');
-  const folder = document.getElementById('folderName').value.trim() || 'photoshift';
-  area.innerHTML = '';
+function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
+function randName(locName, idx, ext) {
+  var suffix = Math.random().toString(36).slice(2,7).toUpperCase();
+  return 'img_'+locName+'_v'+idx+'_'+suffix+'.'+ext;
+}
 
-  // Download All button
-  const header = document.createElement('div');
-  header.className = 'results-header';
-  header.innerHTML = `
-    <div>
-      <div class="results-title">Generated Variations</div>
-      <div class="results-meta">${results.length} source${results.length !== 1 ? 's' : ''} × ${varCount} variants = ${results.length * varCount} files</div>
-    </div>
-    <button class="download-all-btn" id="downloadAllBtn">⬇ Download All (ZIP)</button>`;
-  area.appendChild(header);
+// ── GENERATE ───────────────────────────────────────────────────────────────
+function generate() {
+  var btn = document.getElementById('generateBtn');
+  btn.disabled = true;
 
-  header.querySelector('#downloadAllBtn').addEventListener('click', () => downloadAll(folder));
+  var toProcess = files.filter(function(f){ return selectedIds.has(f.id); });
+  var locs = getCheckedLocs();
+  results = [];
 
-  // Per-source sections
-  results.forEach(r => {
-    const baseName = r.sourceName.replace(/\.[^.]+$/, '');
-    const section  = document.createElement('div');
+  var progWrap = document.getElementById('progWrap');
+  var progFill = document.getElementById('progFill');
+  var progLbl  = document.getElementById('progLbl');
+  progWrap.classList.add('active');
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('resultsArea').innerHTML='';
 
-    const sec_header = document.createElement('div');
-    sec_header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;';
-    sec_header.innerHTML = `
-      <div style="font-size:0.7rem;color:var(--muted)">${r.sourceName}</div>
-      <button class="dl-btn" style="font-size:0.62rem;padding:4px 10px;" data-src="${r.sourceId}">⬇ this batch</button>`;
-    sec_header.querySelector('button').addEventListener('click', () => downloadBatch(r, folder, baseName));
-    section.appendChild(sec_header);
+  var total = locs.length * toProcess.length * varCount;
+  var done = 0;
 
-    const grid = document.createElement('div');
-    grid.className = 'variants-grid';
-
-    r.blobs.forEach((b, i) => {
-      const card = document.createElement('div');
-      card.className = 'variant-card';
-      const fname = randomFilename(folder, baseName, i);
-
-      if (r.isVideo) {
-        card.innerHTML = `
-          <div class="variant-preview video-preview">🎬</div>
-          <div class="variant-footer">
-            <span class="variant-num">v${i+1}</span>
-            <button class="dl-btn">Save</button>
-          </div>`;
-      } else {
-        const url = URL.createObjectURL(b.blob);
-        card.innerHTML = `
-          <img class="variant-preview" src="${url}" alt="v${i+1}">
-          <div class="variant-footer">
-            <span class="variant-num">v${i+1}</span>
-            <button class="dl-btn">Save</button>
-          </div>`;
+  // Build work: for each location, for each source file, varCount variations
+  var work = Promise.resolve();
+  locs.forEach(function(loc){
+    var locItems = [];
+    toProcess.forEach(function(f){
+      for (var i=0; i<varCount; i++) {
+        (function(srcFile, vIdx){
+          work = work.then(function(){
+            progLbl.textContent = loc+' — '+srcFile.name+' v'+(vIdx+1);
+            progFill.style.width = (done/total*100)+'%';
+            if (srcFile.isVideo) {
+              locItems.push({sourceName:srcFile.name,blob:srcFile.file,ext:srcFile.name.split('.').pop(),isVideo:true,loc:loc});
+              done++;
+              return sleep(10);
+            } else {
+              return shiftImage(srcFile.file).then(function(result){
+                locItems.push({sourceName:srcFile.name,blob:result.blob,ext:result.ext,isVideo:false,loc:loc});
+                done++;
+              });
+            }
+          });
+        })(f, i);
       }
+    });
+    work = work.then(function(){
+      results.push({location:loc, items:locItems.filter(function(x){ return x.loc===loc; })});
+    });
+  });
 
-      card.querySelector('.dl-btn').addEventListener('click', () => {
-        triggerDownload(b.blob, fname + '.' + b.ext);
+  work.then(function(){
+    progFill.style.width='100%';
+    progLbl.textContent='Done ✓';
+    setTimeout(function(){ progWrap.classList.remove('active'); }, 1200);
+    renderResults();
+    btn.disabled = false;
+  });
+}
+
+// ── RENDER RESULTS ─────────────────────────────────────────────────────────
+function renderResults() {
+  var area = document.getElementById('resultsArea');
+  var date = document.getElementById('sessDate').value || 'DATE';
+  var prod = (document.getElementById('sessProduct').value || 'Photos').trim();
+  var folderBase = date+'_'+prod;
+  area.innerHTML='';
+
+  var hdr = document.createElement('div');
+  hdr.className='results-hdr';
+  var totalFiles = results.reduce(function(n,r){ return n+r.items.length; },0);
+  hdr.innerHTML='<div><div class="results-title">Generated</div><div class="results-meta">'+results.length+' locations × '+totalFiles+' files</div></div>';
+
+  var saveBtn = document.createElement('button');
+  saveBtn.className='save-folder-btn';
+  saveBtn.textContent='📁 Save All to Folder';
+  saveBtn.onclick = function(){ saveAllToFolder(folderBase); };
+  hdr.appendChild(saveBtn);
+  area.appendChild(hdr);
+
+  results.forEach(function(r){
+    var sec = document.createElement('div');
+    sec.className='loc-section';
+    var secHdr = document.createElement('div');
+    secHdr.className='loc-section-title';
+    secHdr.textContent=folderBase+' / '+r.location+' ('+r.items.length+' files)';
+    sec.appendChild(secHdr);
+
+    var grid = document.createElement('div');
+    grid.className='variants-grid';
+    r.items.forEach(function(item, i){
+      var card = document.createElement('div');
+      card.className='vcard';
+      var fname = randName(r.location, i+1, item.ext);
+      if (item.isVideo) {
+        card.innerHTML='<div class="vcard-vid">🎬</div><div class="vcard-foot"><span class="vcard-num">'+r.location+' v'+(i+1)+'</span><button class="dl-btn" onclick="">Save</button></div>';
+      } else {
+        var url = URL.createObjectURL(item.blob);
+        card.innerHTML='<img src="'+url+'" alt=""><div class="vcard-foot"><span class="vcard-num">'+r.location+' v'+(i+1)+'</span><button class="dl-btn">Save</button></div>';
+      }
+      card.querySelector('.dl-btn').addEventListener('click', function(){
+        triggerDL(item.blob, fname);
       });
       grid.appendChild(card);
     });
-
-    section.appendChild(grid);
-    area.appendChild(section);
+    sec.appendChild(grid);
+    area.appendChild(sec);
   });
 }
 
-// ─── DOWNLOAD HELPERS ────────────────────────────────────────────────────────
-function randomFilename(folder, base, idx) {
-  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `${folder}_${base}_v${idx+1}_${suffix}`;
+// ── SAVE TO FOLDER (File System Access API) ────────────────────────────────
+async function saveAllToFolder(folderBase) {
+  if (!window.showDirectoryPicker) {
+    // Fallback: sequential download
+    for (var r of results) {
+      for (var i=0; i<r.items.length; i++) {
+        var item = r.items[i];
+        triggerDL(item.blob, randName(r.location, i+1, item.ext));
+        await sleep(150);
+      }
+    }
+    return;
+  }
+
+  try {
+    var rootDir = await window.showDirectoryPicker({ mode:'readwrite' });
+    var sessionDir = await rootDir.getDirectoryHandle(folderBase, { create:true });
+
+    for (var r of results) {
+      var locDir = await sessionDir.getDirectoryHandle(r.location, { create:true });
+      for (var i=0; i<r.items.length; i++) {
+        var item = r.items[i];
+        var fname = randName(r.location, i+1, item.ext);
+        var fh = await locDir.getFileHandle(fname, { create:true });
+        var writable = await fh.createWritable();
+        await writable.write(item.blob);
+        await writable.close();
+      }
+    }
+    alert('Saved to: ' + folderBase);
+  } catch(err) {
+    if (err.name !== 'AbortError') {
+      alert('Folder save failed, downloading individually instead.');
+      for (var r of results) {
+        for (var i=0; i<r.items.length; i++) {
+          triggerDL(r.items[i].blob, randName(r.location, i+1, r.items[i].ext));
+          await sleep(150);
+        }
+      }
+    }
+  }
 }
 
-function triggerDownload(blob, filename) {
-  const a   = document.createElement('a');
-  a.href    = URL.createObjectURL(blob);
+function triggerDL(blob, filename) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
 }
-
-async function downloadBatch(r, folder, baseName) {
-  for (let i = 0; i < r.blobs.length; i++) {
-    const b = r.blobs[i];
-    const fname = randomFilename(folder, baseName, i) + '.' + b.ext;
-    triggerDownload(b.blob, fname);
-    await sleep(120);
-  }
-}
-
-async function downloadAll(folder) {
-  for (const r of results) {
-    const baseName = r.sourceName.replace(/\.[^.]+$/, '');
-    await downloadBatch(r, folder, baseName);
-    await sleep(200);
-  }
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
